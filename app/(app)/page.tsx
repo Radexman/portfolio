@@ -2,6 +2,7 @@ import Link from 'next/link'
 
 import { SidebarCard } from '@/components/layout/SidebarCard'
 import { SplitLayout } from '@/components/layout/SplitLayout'
+import { FeaturedWorkSection } from '@/components/sections/FeaturedWorkSection'
 import { HeroSection } from '@/components/sections/HeroSection'
 import { sanityFetch } from '@/sanity/lib/live'
 import { heroSectionQuery } from '@/sanity/lib/queries'
@@ -57,6 +58,7 @@ export default async function HomePage() {
       }
     >
       <HeroSection hero={hero} />
+      <FeaturedWorkSection />
     </SplitLayout>
   )
 }

@@ -30,3 +30,37 @@ export const heroSectionQuery = defineQuery(`
     scrollCue
   }
 `)
+
+/**
+ * The Featured work section: its header copy and the three projects beneath it.
+ *
+ * One query rather than two so the section makes a single round trip. `stack`
+ * is dereferenced to names here — the card shows the first four and the
+ * sidebar readout shows all of them, so both need the resolved list.
+ *
+ * `coverImage` is projected whole for the same reason as the hero portrait:
+ * `urlFor()` needs the asset reference plus the hotspot to honour the focal
+ * point chosen in Studio.
+ */
+export const featuredWorkQuery = defineQuery(`{
+  "section": *[_type == "featuredWorkSection"][0]{
+    eyebrow,
+    headline,
+    subheadline
+  },
+  "projects": *[_type == "project" && featured == true] | order(order asc)[0...3]{
+    _id,
+    title,
+    "slug": slug.current,
+    thesis,
+    company,
+    role,
+    year,
+    visibility,
+    liveUrl,
+    coverImage,
+    problem,
+    designCredit,
+    "stack": stack[]->name
+  }
+}`)
