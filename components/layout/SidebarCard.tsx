@@ -5,6 +5,7 @@ import gsap from 'gsap'
 import Image from 'next/image'
 import { useRef } from 'react'
 
+import { CardReadout } from '@/components/layout/CardReadout'
 import {
   ArrowUpRightIcon,
   DocumentIcon,
@@ -181,11 +182,11 @@ export function SidebarCard({
 
           {/*
             Readout slot. Empty at hero, so it takes no space — reserving
-            height here pushed the greeting into the middle of the card. The
-            contextual variants ship with featured work and set their own fixed
-            height, which is what actually prevents reflow between sections.
+            height here pushed the greeting into the middle of the card. Each
+            variant sets its own fixed height, which is what actually prevents
+            the card reflowing when the readout swaps.
           */}
-          <div data-readout-slot="" aria-hidden="true" />
+          <CardReadout />
 
           <hr className="my-4 border-border/70" />
 
