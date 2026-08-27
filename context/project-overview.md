@@ -225,7 +225,7 @@ Fixed-height block above the socials. Content crossfades — `~200ms` opacity pl
 - **Stat row** — count up on first view, mono labels:
   `5` production systems · `4` shipped solo · `7` languages shipped · `2` years teaching
   **No "years of experience" stat.** It is the one number that works against me, and every other number makes it irrelevant.
-- **Company ticker** in mono: `Giganci Programowania · Jointhubs · Hued.me · → Booksy`
+- **Company ticker** in mono: `Giganci Programowania · Jointhubs · Hued.me · Booksy` — the current employer is marked by the accent colour alone, no arrow
   Not client logos — those are the clients' IP, not mine.
 - Subtle scroll cue
 

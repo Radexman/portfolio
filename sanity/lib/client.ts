@@ -6,5 +6,7 @@ export const client = createClient({
   projectId,
   dataset,
   apiVersion,
-  useCdn: true, // Set to false if statically generating pages, using ISR or tag-based revalidation
+  // false because pages are statically generated with ISR (revalidate: 3600)
+  // and sanityFetch drives live updates — the CDN would serve stale content.
+  useCdn: false,
 })
