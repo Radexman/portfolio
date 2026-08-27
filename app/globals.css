@@ -1,26 +1,75 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ---------------------------------------------------------------------------
+   Design tokens — Tailwind v4 CSS-based config.
+   Do NOT add a tailwind.config.ts/js file; all theme config lives here.
+   Dark only: there is no light mode and no toggle.
+   --------------------------------------------------------------------------- */
+
+@theme {
+	/* Palette — one accent only */
+	--color-base: #0a0b0e; /* page background, never pure black */
+	--color-surface: #121419; /* cards, panels */
+	--color-surface-raised: #191c23; /* hover states, nested panels */
+	--color-border: #252932; /* hairline borders, dividers, grid lines */
+	--color-fg: #e8e6e3; /* headings and body, never #FFF */
+	--color-fg-muted: #8a8f9a; /* labels, metadata, captions */
+	--color-accent: #00e5c7; /* CTAs, active states, timeline nodes */
+
+	/* Radius */
+	--radius-sm: 4px; /* small elements */
+	--radius-card: 8px; /* cards */
+
+	/* Tracking */
+	--tracking-display: -0.02em; /* Inter Tight headings */
+	--tracking-label: 0.08em; /* uppercase mono labels */
 }
 
+/* `inline` so the font utilities resolve the next/font variables at use site */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+	--font-display: var(--font-inter-tight);
+	--font-sans: var(--font-inter);
+	--font-mono: var(--font-jetbrains-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+@layer base {
+	:root {
+		color-scheme: dark;
+	}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+	/* Hairline borders are the primary structural device — default them to the
+	   border token so `border` alone is correct without repeating the color. */
+	*,
+	::after,
+	::before {
+		border-color: var(--color-border);
+	}
+
+	body {
+		background-color: var(--color-base);
+		color: var(--color-fg);
+		font-family: var(--font-sans);
+		line-height: 1.6;
+	}
+
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		font-family: var(--font-display);
+		letter-spacing: var(--tracking-display);
+		line-height: 1.1;
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 2px;
+	}
+
+	::selection {
+		background-color: var(--color-accent);
+		color: var(--color-base);
+	}
 }

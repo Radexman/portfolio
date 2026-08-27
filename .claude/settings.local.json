@@ -1,0 +1,17 @@
+{
+	"permissions": {
+		"allow": [
+			"mcp__playwright__browser_type",
+			"mcp__playwright__browser_snapshot",
+			"Bash(npx prettier *)",
+			"mcp__playwright__browser_console_messages",
+			"mcp__playwright__browser_evaluate",
+			"mcp__playwright__browser_click",
+			"mcp__playwright__browser_navigate",
+			"mcp__Sanity__query_documents",
+			"mcp__Sanity__patch_documents",
+			"mcp__Sanity__publish_documents",
+			"mcp__playwright__browser_resize"
+		]
+	}
+}
