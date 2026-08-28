@@ -1,4 +1,4 @@
-# Current Feature
+# Current Feature: Side Project Section (Beekeeping)
 
 ## Status
 
@@ -6,11 +6,36 @@ Not Started
 
 ## Goals
 
-<!-- Populated by /feature load -->
+- **Sanity — `sideProjectSection` singleton** with `eyebrow`, `headline`, `framingLine`, `triptych` (array of `triptychImage`, exactly 3), `project` (reference → `project`), and `inspectionSteps` (array of `inspectionStep`, max 5). Registered in `sanity/schemaTypes/index.ts` and pinned in `sanity/structure.ts` the same way `heroSection` and `featuredWorkSection` are.
+- **Two new objects** — `triptychImage` (`image` with hotspot + required `alt`, plus a lowercase one-word `caption`) and `inspectionStep` (`prompt` / `response` / `field`).
+- **Seed and publish** the Hive Log `project` document (`featured: false`, `thesis: "product-thinking"`, company `Personal project`, role `Everything — design, backend, voice flow`, year `2025 — present`, the Python/FastAPI/Whisper/LLM/PDF stack, and the three-field problem/approach/outcome copy from the spec), plus the section copy and inspection steps.
+- **`SideProjectSection`** (server) fetches header copy, triptych, the referenced project and the steps in one query added to `sanity/lib/queries.ts`; a client shell owns `<section id="beekeeping">`, `useSectionObserver`, and the reveals — the three-file split already used by Featured work.
+- **`Triptych`** — three `3:4` figures, `next/image` with `fill` + hotspot + explicit `sizes`, hairline borders, lowercase mono captions, hover changes border colour only.
+- **Project block** — title, mono role line, problem then approach (constraint before feature), `StackTags`-equivalent tag row and the same `visibility`-driven link row as `FeaturedProjectCard`.
+- **`VoiceFlow`** — static vertical prompt / response / field list on a `1px` connector, revealing on a deliberately slow `0.12` stagger with the line drawing `scaleY: 0 → 1` alongside. No microphone, no speech API, no audio.
+- **`SideProjectReadout`** added to the `CardReadout` variant map, keyed `beekeeping`, reusing the `FeaturedWorkReadout` layout with `role` / `meta` / `stack` props.
+- **Responsive** — `grid-cols-3` at `md+`; below `md` a snap-scrolling `flex` row at `w-[70%]` per figure with a `mask-image` edge fade. Never stacked vertically.
+- **Motion** — four `ScrollTrigger` reveals (`once: true`) inside `gsap.matchMedia()`; under `reduce` nothing animates and the connector renders full height.
+- `npm run lint`, `npx tsc --noEmit` and `npm run build` clean, then a real browser pass at `lg` / `md` / `390px`.
 
 ## Notes
 
-<!-- Populated by /feature load -->
+**Spec-to-codebase corrections — the spec was written against a layout this repo does not have:**
+
+- **No `src/` directory.** Files land at `components/sections/SideProjectSection.tsx` and `components/side-project/{Triptych,VoiceFlow}.tsx`; schemas at `sanity/schemaTypes/documents/sideProjectSection.ts` and `sanity/schemaTypes/objects/{triptychImage,inspectionStep}.ts`.
+- **There is no `homePage` singleton.** The spec says "add `sideProjectSection` to the `homePage` singleton". This project uses sibling singletons — `heroSection`, `featuredWorkSection` — for exactly the reason recorded when Featured work shipped. `sideProjectSection` becomes a third sibling; inventing `homePage` now would mean migrating two published documents.
+- **`text-base` is a colour in this project, not a size.** The spec uses it four times for body copy. `--color-base` exists, so Tailwind resolves `text-base` to `color: #0A0B0E` — invisible on the page background. Use `text-[length:1rem]` or a named size.
+- **`rounded-lg` / `rounded-xl` are not the project's tokens.** The scale is `--radius-sm` (4px), `--radius-card` (8px), `--radius-shell` / `--radius-inner` for the sidebar. Figures and the project block use `rounded-card` unless a new token is justified.
+- **`thesis: "product-thinking"` already exists** in `PROJECT_THESES`, and `beekeeping` / `sprout` already exists in `NAV_ITEMS`. Neither needs adding.
+- **Section order.** The spec calls this the seventh section; C–F (timeline, teaching, skills, more work) are not built, so this ships third and sits directly after Featured work until they land.
+
+**Open questions before implementation:**
+
+- **The three triptych photographs do not exist**, and the spec is explicit that the grading must happen in the source files, not in CSS — no `grayscale`/`sepia` shortcut. Without them the section renders three placeholder frames, the same state Featured work is still in. Confirm whether to ship the structure with placeholders or wait on the images.
+- **Hive Log's `visibility`** — the spec says "`public` or `no-public-url`, whichever is true". Needs an answer before seeding; `no-public-url` is the safe default.
+- **The bento exclusion rule is unbuildable yet.** More work does not exist, so its query cannot filter the hive app out. Recorded as a hard requirement for whoever builds section F rather than done here.
+
+**Carried in from the working tree:** `components/layout/SidebarCard.tsx`, `components/navigation/MobileMenuPanel.tsx` and `context/features/mobile-nav-spec.md` are modified and uncommitted (one line each in the two components). These should be resolved before branching so they do not ride along in this feature's commit.
 
 ## History
 
