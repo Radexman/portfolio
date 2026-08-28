@@ -57,47 +57,79 @@ export function HeroSection({ hero }: { hero: HeroSectionData }) {
         })
 
         timeline
-          .from('[data-hero="eyebrow"]', {
-            opacity: 0,
-            y: 8,
-            duration: 0.4,
-          }, 0.12)
-          .from('[data-hero="headline"]', {
-            opacity: 0,
-            y: 16,
-            duration: 0.6,
-            ease: 'expo.out',
-          }, 0.2)
-          .from('[data-hero="subheadline"]', {
-            opacity: 0,
-            y: 16,
-            duration: 0.6,
-            ease: 'expo.out',
-          }, 0.32)
-          .from('[data-hero="focus"]', {
-            opacity: 0,
-            y: 12,
-            duration: 0.45,
-          }, 0.44)
-          .from('[data-hero="availability"]', {
-            opacity: 0,
-            y: 12,
-            duration: 0.45,
-          }, 0.52)
-          .from('[data-hero="stat"]', {
-            opacity: 0,
-            y: 12,
-            duration: 0.45,
-            stagger: 0.06,
-          }, 0.6)
-          .from('[data-hero="ticker"]', {
-            opacity: 0,
-            duration: 0.7,
-          }, 0.86)
-          .from('[data-hero="scroll-cue"]', {
-            opacity: 0,
-            duration: 0.4,
-          }, 1)
+          .from(
+            '[data-hero="eyebrow"]',
+            {
+              opacity: 0,
+              y: 8,
+              duration: 0.4,
+            },
+            0.12,
+          )
+          .from(
+            '[data-hero="headline"]',
+            {
+              opacity: 0,
+              y: 16,
+              duration: 0.6,
+              ease: 'expo.out',
+            },
+            0.2,
+          )
+          .from(
+            '[data-hero="subheadline"]',
+            {
+              opacity: 0,
+              y: 16,
+              duration: 0.6,
+              ease: 'expo.out',
+            },
+            0.32,
+          )
+          .from(
+            '[data-hero="focus"]',
+            {
+              opacity: 0,
+              y: 12,
+              duration: 0.45,
+            },
+            0.44,
+          )
+          .from(
+            '[data-hero="availability"]',
+            {
+              opacity: 0,
+              y: 12,
+              duration: 0.45,
+            },
+            0.52,
+          )
+          .from(
+            '[data-hero="stat"]',
+            {
+              opacity: 0,
+              y: 12,
+              duration: 0.45,
+              stagger: 0.06,
+            },
+            0.6,
+          )
+          .from(
+            '[data-hero="ticker"]',
+            {
+              opacity: 0,
+              duration: 0.7,
+            },
+            0.86,
+          )
+          .from(
+            '[data-hero="scroll-cue"]',
+            {
+              opacity: 0,
+              duration: 0.4,
+            },
+            1,
+          )
 
         // Count-up runs alongside the stat stagger, once, never on scroll-back.
         const counters = gsap.utils.toArray<HTMLElement>('[data-countup]')
@@ -118,14 +150,14 @@ export function HeroSection({ hero }: { hero: HeroSectionData }) {
                 counter.textContent = `${Math.round(proxy.value)}${parsed.suffix}`
               },
             },
-            0.6
+            0.6,
           )
         }
       })
 
       return () => mm.revert()
     },
-    { scope: sectionRef }
+    { scope: sectionRef },
   )
 
   const { currentFocus, workCta, availabilityNote } = hero
@@ -134,28 +166,25 @@ export function HeroSection({ hero }: { hero: HeroSectionData }) {
     <section
       ref={sectionRef}
       id="hero"
-      className="section-padding relative flex min-h-svh flex-col justify-center py-24 lg:py-0"
+      className="relative flex min-h-svh flex-col justify-center section-padding py-24 lg:py-0"
     >
       {/* The single background effect, plus the page grid beneath it. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 overflow-hidden"
-      >
-        <div className="page-grid absolute inset-0" />
-        <div className="hero-glow absolute inset-0" />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 page-grid" />
+        <div className="absolute inset-0 hero-glow" />
       </div>
 
       <div className="relative max-w-2xl">
         <p
           data-hero="eyebrow"
-          className="font-mono text-xs uppercase tracking-[0.18em] text-fg-muted"
+          className="font-mono text-xs tracking-[0.18em] text-fg-muted uppercase"
         >
           {hero.eyebrow}
         </p>
 
         <h1
           data-hero="headline"
-          className="mt-6 font-display text-4xl font-bold leading-[0.95] tracking-display md:text-6xl lg:text-7xl"
+          className="mt-6 font-display text-4xl leading-[0.95] font-bold tracking-display md:text-6xl lg:text-7xl"
         >
           <span className="text-fg">{hero.headlineLead}</span>
           <span className="mt-1 block text-accent">{hero.headlineAccent}</span>
@@ -163,7 +192,7 @@ export function HeroSection({ hero }: { hero: HeroSectionData }) {
 
         <p
           data-hero="subheadline"
-          className="mt-6 max-w-lg text-base leading-relaxed text-fg-muted md:text-lg"
+          className="mt-6 max-w-lg leading-relaxed text-base text-fg-muted md:text-lg"
         >
           {hero.subheadline}
         </p>
@@ -174,19 +203,16 @@ export function HeroSection({ hero }: { hero: HeroSectionData }) {
             className="mt-10 max-w-md rounded-r-card border border-l-2 border-border border-l-accent bg-surface/60 p-5"
           >
             <p className="flex items-center gap-2">
-              <span
-                aria-hidden="true"
-                className="size-1.5 rounded-full bg-accent"
-              />
-              <span className="font-mono text-[11px] uppercase tracking-label text-fg-muted">
+              <span aria-hidden="true" className="size-1.5 rounded-full bg-accent" />
+              <span className="font-mono text-[11px] tracking-label text-fg-muted uppercase">
                 {currentFocus.label}
               </span>
             </p>
-            <p className="mt-2 font-display text-base font-semibold text-fg">
+            <p className="mt-2 font-display font-semibold text-base text-fg">
               {currentFocus.statement}
             </p>
             {currentFocus.tags && currentFocus.tags.length > 0 && (
-              <p className="mt-2 font-mono text-[11px] uppercase tracking-label text-fg-muted">
+              <p className="mt-2 font-mono text-[11px] tracking-label text-fg-muted uppercase">
                 {currentFocus.tags.join(' · ')}
               </p>
             )}
@@ -199,9 +225,7 @@ export function HeroSection({ hero }: { hero: HeroSectionData }) {
             className="mt-6 flex max-w-md flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
           >
             {availabilityNote && (
-              <p className="font-mono text-xs text-fg-muted">
-                {availabilityNote}
-              </p>
+              <p className="font-mono text-xs text-fg-muted">{availabilityNote}</p>
             )}
             {workCta && (
               <a
@@ -219,11 +243,11 @@ export function HeroSection({ hero }: { hero: HeroSectionData }) {
             <div key={item.label} data-hero="stat">
               <dd
                 data-countup={item.value}
-                className="font-display text-4xl font-bold tabular-nums text-fg"
+                className="font-display text-4xl font-bold text-fg tabular-nums"
               >
                 {item.value}
               </dd>
-              <dt className="mt-1 font-mono text-[10px] uppercase tracking-label text-fg-muted">
+              <dt className="mt-1 font-mono text-[10px] tracking-label text-fg-muted uppercase">
                 {item.label}
               </dt>
             </div>
@@ -232,10 +256,7 @@ export function HeroSection({ hero }: { hero: HeroSectionData }) {
       </div>
 
       {hero.ticker.length > 0 && (
-        <div
-          data-hero="ticker"
-          className="marquee-mask relative mt-12 overflow-hidden"
-        >
+        <div data-hero="ticker" className="relative mt-12 overflow-hidden marquee-mask">
           <div className="flex w-max animate-marquee hover:[animation-play-state:paused]">
             {/* Rendered twice so the -50% keyframe lands on a seamless seam */}
             <TickerTrack items={hero.ticker} />

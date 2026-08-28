@@ -19,9 +19,9 @@ export default async function HomePage() {
   // Render a usable empty state rather than crashing the page.
   if (!hero) {
     return (
-      <main className="section-padding flex min-h-svh items-center">
+      <main className="flex min-h-svh items-center section-padding">
         <div className="max-w-md">
-          <p className="font-mono text-xs uppercase tracking-label text-fg-muted">
+          <p className="font-mono text-xs tracking-label text-fg-muted uppercase">
             {'// no content'}
           </p>
           <h1 className="mt-4 font-display text-3xl font-semibold text-fg">
@@ -29,10 +29,7 @@ export default async function HomePage() {
           </h1>
           <p className="mt-3 text-fg-muted">
             Open{' '}
-            <Link
-              href="/studio"
-              className="text-accent underline underline-offset-4"
-            >
+            <Link href="/studio" className="text-accent underline underline-offset-4">
               the Studio
             </Link>{' '}
             and publish the hero section document to populate this page.

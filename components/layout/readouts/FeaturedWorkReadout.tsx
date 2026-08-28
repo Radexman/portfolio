@@ -11,17 +11,11 @@ import type { FeaturedWorkPayload } from '@/types/work'
  * so the fixed height lives on the variants instead — without it the card
  * reflows every time the payload swaps.
  */
-export function FeaturedWorkReadout({
-  payload,
-}: {
-  payload: FeaturedWorkPayload
-}) {
+export function FeaturedWorkReadout({ payload }: { payload: FeaturedWorkPayload }) {
   return (
-    <div className="min-h-[4.5rem]">
-      <p className="font-display text-sm font-semibold text-fg">
-        {payload.role}
-      </p>
-      <p className="mt-1 font-mono text-[11px] uppercase tracking-widest text-fg-muted">
+    <div className="min-h-18">
+      <p className="font-display text-sm font-semibold text-fg">{payload.role}</p>
+      <p className="mt-1 font-mono text-[11px] tracking-widest text-fg-muted uppercase">
         {payload.company} · {payload.year}
       </p>
       {payload.stack.length > 0 && (
@@ -38,9 +32,7 @@ export function FeaturedWorkReadout({
  * payload, but the context stores `Record<string, unknown>` for every section,
  * so the shape is checked before it is rendered rather than cast.
  */
-export function isFeaturedWorkPayload(
-  payload: unknown
-): payload is FeaturedWorkPayload {
+export function isFeaturedWorkPayload(payload: unknown): payload is FeaturedWorkPayload {
   if (typeof payload !== 'object' || payload === null) return false
   const candidate = payload as Partial<FeaturedWorkPayload>
   return (

@@ -29,12 +29,7 @@ export const SOCIAL_ORDER: SocialPlatform[] = ['github', 'linkedin', 'x', 'email
 
 export function SocialIcon({ platform }: { platform: SocialPlatform }) {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      aria-hidden="true"
-      className="size-[18px]"
-    >
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="size-[18px]">
       <path d={PATHS[platform]} />
     </svg>
   )

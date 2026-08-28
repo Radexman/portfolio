@@ -51,24 +51,18 @@ export function FeaturedWorkShell({
 
       return () => mm.revert()
     },
-    { scope: sectionRef }
+    { scope: sectionRef },
   )
 
   return (
-    <section
-      ref={sectionRef}
-      id="work"
-      className="section-padding relative bg-base py-24 lg:py-32"
-    >
+    <section ref={sectionRef} id="work" className="relative bg-base section-padding py-24 lg:py-32">
       <div data-work-header className="max-w-2xl">
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">
-          {copy.eyebrow}
-        </p>
+        <p className="font-mono text-xs tracking-[0.18em] text-accent uppercase">{copy.eyebrow}</p>
         <h2 className="mt-3 font-display text-4xl font-bold tracking-display text-fg md:text-5xl">
           {copy.headline}
         </h2>
         {copy.subheadline && (
-          <p className="mt-3 max-w-xl text-base leading-relaxed text-fg-muted">
+          <p className="mt-3 max-w-xl leading-relaxed text-base text-fg-muted">
             {copy.subheadline}
           </p>
         )}

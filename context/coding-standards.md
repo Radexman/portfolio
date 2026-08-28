@@ -76,7 +76,7 @@ npx tsc --noEmit # type-check
 - No JavaScript-based config allowed
 
 ```css
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   --color-accent: #00e5c7;

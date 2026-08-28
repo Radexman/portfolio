@@ -26,23 +26,19 @@ export default defineConfig({
     // Singletons are reachable only through the structure entry, so drop the
     // actions that would create a second copy or remove the only one.
     actions: (prev, context) =>
-      SINGLETON_TYPES.includes(
-        context.schemaType as (typeof SINGLETON_TYPES)[number]
-      )
+      SINGLETON_TYPES.includes(context.schemaType as (typeof SINGLETON_TYPES)[number])
         ? prev.filter(
             (action) =>
               !SINGLETON_DISABLED_ACTIONS.includes(
-                action.action as (typeof SINGLETON_DISABLED_ACTIONS)[number]
-              )
+                action.action as (typeof SINGLETON_DISABLED_ACTIONS)[number],
+              ),
           )
         : prev,
     // Keep singletons out of the global "create new" menu.
     newDocumentOptions: (prev) =>
       prev.filter(
         (template) =>
-          !SINGLETON_TYPES.includes(
-            template.templateId as (typeof SINGLETON_TYPES)[number]
-          )
+          !SINGLETON_TYPES.includes(template.templateId as (typeof SINGLETON_TYPES)[number]),
       ),
   },
   plugins: [

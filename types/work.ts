@@ -11,11 +11,7 @@ import type { SanityImageSource } from '@sanity/image-url'
 
 /** Mirrors `PROJECT_THESES` in sanity/schemaTypes/documents/project.ts. */
 export type ProjectThesis =
-  | 'architecture'
-  | 'data-application'
-  | 'ai-realtime'
-  | 'product-thinking'
-  | 'craft-i18n'
+  'architecture' | 'data-application' | 'ai-realtime' | 'product-thinking' | 'craft-i18n'
 
 /** Mirrors `PROJECT_VISIBILITIES` in the same file. */
 export type ProjectVisibility = 'public' | 'no-public-url' | 'anonymised'

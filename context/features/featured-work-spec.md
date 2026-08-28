@@ -18,41 +18,41 @@ Deliberately **not** a bento grid: three items in a bento is three boxes with ex
 
 The full schema is defined in `@context/portfolio-project-spec.md`. This section reads:
 
-| Field | Type | Use in this section |
-| --- | --- | --- |
-| `title` | string | Card headline |
-| `slug` | slug | `→ case study` link target |
-| `featured` | boolean | Filter — only `true` renders here |
-| `order` | number | Sort order within the three slots |
-| `thesis` | string | Mono eyebrow — see allowed values below |
-| `company` | string | Rendered beside the year |
-| `role` | string | Honest scope, e.g. `"Sole frontend owner"` / `"Four key features"` |
-| `year` | string | |
-| `stack` | array of refs → `technology` | First 4 render as tags on the card; all render in the readout |
-| `visibility` | string | Controls the link row — see below |
-| `liveUrl` | url (optional) | |
-| `coverImage` | image (hotspot) | The screenshot |
-| `problem` | text | First sentence renders as the card's problem line |
+| Field        | Type                         | Use in this section                                                |
+| ------------ | ---------------------------- | ------------------------------------------------------------------ |
+| `title`      | string                       | Card headline                                                      |
+| `slug`       | slug                         | `→ case study` link target                                         |
+| `featured`   | boolean                      | Filter — only `true` renders here                                  |
+| `order`      | number                       | Sort order within the three slots                                  |
+| `thesis`     | string                       | Mono eyebrow — see allowed values below                            |
+| `company`    | string                       | Rendered beside the year                                           |
+| `role`       | string                       | Honest scope, e.g. `"Sole frontend owner"` / `"Four key features"` |
+| `year`       | string                       |                                                                    |
+| `stack`      | array of refs → `technology` | First 4 render as tags on the card; all render in the readout      |
+| `visibility` | string                       | Controls the link row — see below                                  |
+| `liveUrl`    | url (optional)               |                                                                    |
+| `coverImage` | image (hotspot)              | The screenshot                                                     |
+| `problem`    | text                         | First sentence renders as the card's problem line                  |
 
 ### Allowed `thesis` values (`options.list`)
 
 Each featured project argues something different. Three cards sharing a Next.js + CMS + Azure stack blur into one unless each has its own thesis.
 
-| Value | Label |
-| --- | --- |
-| `"architecture"` | Architecture |
-| `"data-application"` | Data application |
-| `"ai-realtime"` | AI & real-time |
-| `"product-thinking"` | Product thinking |
-| `"craft-i18n"` | Craft & localisation |
+| Value                | Label                |
+| -------------------- | -------------------- |
+| `"architecture"`     | Architecture         |
+| `"data-application"` | Data application     |
+| `"ai-realtime"`      | AI & real-time       |
+| `"product-thinking"` | Product thinking     |
+| `"craft-i18n"`       | Craft & localisation |
 
 ### `visibility` handling
 
-| Value | Link row renders |
-| --- | --- |
-| `"public"` | `↗ liveUrl` (hostname only as label) + `→ case study` |
+| Value             | Link row renders                                                   |
+| ----------------- | ------------------------------------------------------------------ |
+| `"public"`        | `↗ liveUrl` (hostname only as label) + `→ case study`              |
 | `"no-public-url"` | `Internal platform — no public URL` in `fg-muted` + `→ case study` |
-| `"anonymised"` | `Client work — details on request` in `fg-muted` + `→ case study` |
+| `"anonymised"`    | `Client work — details on request` in `fg-muted` + `→ case study`  |
 
 Never hardcode a per-project exception in the component. BRAIN has no public URL by design; the field handles it.
 
@@ -66,11 +66,11 @@ Never hardcode a per-project exception in the component. BRAIN has no public URL
 
 Three `project` documents, `featured: true`:
 
-| Order | Title | Thesis | Company | Role | Visibility |
-| --- | --- | --- | --- | --- | --- |
-| 1 | MB Group Multisite | `architecture` | Hued.me | Sole frontend owner | `public` |
-| 2 | Debt Exchange | `data-application` | Hued.me | Four key features | `public` |
-| 3 | BRAIN | `ai-realtime` | Hued.me | UI & chat experience | `no-public-url` |
+| Order | Title              | Thesis             | Company | Role                 | Visibility      |
+| ----- | ------------------ | ------------------ | ------- | -------------------- | --------------- |
+| 1     | MB Group Multisite | `architecture`     | Hued.me | Sole frontend owner  | `public`        |
+| 2     | Debt Exchange      | `data-application` | Hued.me | Four key features    | `public`        |
+| 3     | BRAIN              | `ai-realtime`      | Hued.me | UI & chat experience | `no-public-url` |
 
 Problem lines (first sentence of `problem`, seed as written):
 
@@ -107,7 +107,7 @@ The mechanism the split layout exists for. Ships here.
 
 - Role line: `font-display text-sm font-semibold text-fg`
 - Meta line: mono `text-[11px] tracking-widest uppercase text-fg-muted mt-1` — `{company} · {year}`
-- Stack: mono `text-[11px] text-fg-muted mt-2`, joined with ` · `, truncated to 2 lines with `line-clamp-2`
+- Stack: mono `text-[11px] text-fg-muted mt-2`, joined with `·`, truncated to 2 lines with `line-clamp-2`
 
 ---
 
@@ -163,7 +163,7 @@ Alternating sides: odd-index cards get `lg:[&>figure]:order-2` so the image swap
 Use `gsap` with `useGSAP`. No Motion for React.
 
 ```ts
-gsap.registerPlugin(useGSAP, ScrollTrigger);
+gsap.registerPlugin(useGSAP, ScrollTrigger)
 ```
 
 All animation inside `useGSAP(() => { … }, { scope: containerRef })` — scoped cleanup, no manual `gsap.context()` teardown.
@@ -171,17 +171,18 @@ All animation inside `useGSAP(() => { … }, { scope: containerRef })` — scope
 ### Header block
 
 `ScrollTrigger` at `start: "top 80%"`, `once: true`:
+
 - Eyebrow, headline, subheadline as a timeline: `y: 24 → 0`, `opacity: 0 → 1`, `duration: 0.6`, `ease: "power3.out"`, `stagger: 0.08`
 
 ### Project cards
 
 Each card animates independently, `start: "top 75%"`, `once: true`:
 
-| Target | From | Duration | Position |
-| --- | --- | --- | --- |
-| Image frame | `opacity: 0, y: 40` | `0.7` | `0` |
-| Text block children | `opacity: 0, y: 24`, `stagger: 0.06` | `0.5` | `0.15` |
-| Stack tags | `opacity: 0, y: 12`, `stagger: 0.04` | `0.4` | `0.4` |
+| Target              | From                                 | Duration | Position |
+| ------------------- | ------------------------------------ | -------- | -------- |
+| Image frame         | `opacity: 0, y: 40`                  | `0.7`    | `0`      |
+| Text block children | `opacity: 0, y: 24`, `stagger: 0.06` | `0.5`    | `0.15`   |
+| Stack tags          | `opacity: 0, y: 12`, `stagger: 0.04` | `0.4`    | `0.4`    |
 
 Ease `power3.out` throughout.
 

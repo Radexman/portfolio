@@ -38,7 +38,7 @@ function Monogram({ value }: { value: string }) {
   const [first, ...rest] = value
   return (
     <span className="inline-flex items-center gap-1.5" aria-hidden="true">
-      <span className="font-display text-[19px] font-bold leading-none tracking-[-0.06em] text-fg">
+      <span className="font-display text-[19px] leading-none font-bold tracking-[-0.06em] text-fg">
         {first}
         <span className="text-fg/35">{rest.join('')}</span>
       </span>
@@ -76,7 +76,7 @@ export function SidebarCard({
 
       return () => mm.revert()
     },
-    { scope: cardRef }
+    { scope: cardRef },
   )
 
   // An image field exists as soon as alt text is typed, with no asset until a
@@ -92,8 +92,7 @@ export function SidebarCard({
 
   const orderedSocials = socials
     ? [...socials].sort(
-        (a, b) =>
-          SOCIAL_ORDER.indexOf(a.platform) - SOCIAL_ORDER.indexOf(b.platform)
+        (a, b) => SOCIAL_ORDER.indexOf(a.platform) - SOCIAL_ORDER.indexOf(b.platform),
       )
     : []
 
@@ -113,7 +112,7 @@ export function SidebarCard({
             priority
             sizes="(min-width: 1024px) 33vw, 100vw"
             style={{ objectPosition }}
-            className="object-cover grayscale contrast-110"
+            className="object-cover contrast-110 grayscale"
           />
         ) : (
           <div aria-hidden="true" className="absolute inset-0 bg-surface-raised" />
@@ -125,22 +124,18 @@ export function SidebarCard({
           className="absolute inset-0 bg-gradient-to-t from-base via-base/75 to-transparent"
         />
 
-        <div className="absolute left-5 top-5">
+        <div className="absolute top-5 left-5">
           <Monogram value={monogram} />
         </div>
 
         {orderedSocials.length > 0 && (
-          <ul className="absolute right-5 top-5 flex flex-col gap-2.5">
+          <ul className="absolute top-5 right-5 flex flex-col gap-2.5">
             {orderedSocials.map((social) => (
               <li key={social.platform}>
                 <a
                   href={social.url}
                   target={social.platform === 'email' ? undefined : '_blank'}
-                  rel={
-                    social.platform === 'email'
-                      ? undefined
-                      : 'noreferrer noopener'
-                  }
+                  rel={social.platform === 'email' ? undefined : 'noreferrer noopener'}
                   aria-label={socialLabel(social.platform)}
                   className="grid size-10 place-items-center rounded-full border border-border bg-surface-raised text-fg-muted transition-colors duration-200 hover:border-accent hover:text-accent"
                 >
@@ -158,8 +153,8 @@ export function SidebarCard({
             centred in the ~28px that actually shows. The dot pulses; the
             capsule stays still, so it reads as a status not an alert. */}
         {showBadge && (
-          <div className="absolute -left-5 top-[44%] flex w-12 -translate-y-1/2 flex-col items-center gap-3 rounded-full border border-border bg-surface-raised/90 py-4 pl-5">
-            <span className="rotate-180 font-sans text-[11px] font-medium leading-none text-fg [writing-mode:vertical-rl]">
+          <div className="absolute top-[44%] -left-5 flex w-12 -translate-y-1/2 flex-col items-center gap-3 rounded-full border border-border bg-surface-raised/90 py-4 pl-5">
+            <span className="rotate-180 font-sans text-[11px] leading-none font-medium text-fg [writing-mode:vertical-rl]">
               {statusBadge.label}
             </span>
             <span

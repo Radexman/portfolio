@@ -7,135 +7,135 @@
    --------------------------------------------------------------------------- */
 
 @theme {
-	/* Palette — one accent only */
-	--color-base: #0a0b0e; /* page background, never pure black */
-	--color-surface: #121419; /* cards, panels */
-	--color-surface-raised: #191c23; /* hover states, nested panels */
-	--color-border: #252932; /* hairline borders, dividers, grid lines */
-	--color-fg: #e8e6e3; /* headings and body, never #FFF */
-	--color-fg-muted: #8a8f9a; /* labels, metadata, captions */
-	--color-accent: #00e5c7; /* CTAs, active states, timeline nodes */
+  /* Palette — one accent only */
+  --color-base: #0a0b0e; /* page background, never pure black */
+  --color-surface: #121419; /* cards, panels */
+  --color-surface-raised: #191c23; /* hover states, nested panels */
+  --color-border: #252932; /* hairline borders, dividers, grid lines */
+  --color-fg: #e8e6e3; /* headings and body, never #FFF */
+  --color-fg-muted: #8a8f9a; /* labels, metadata, captions */
+  --color-accent: #00e5c7; /* CTAs, active states, timeline nodes */
 
-	/* Radius */
-	--radius-sm: 4px; /* small elements */
-	--radius-card: 8px; /* cards */
-	--radius-shell: 28px; /* the sidebar card's outer frame */
-	--radius-inner: 22px; /* the portrait framed inside it */
+  /* Radius */
+  --radius-sm: 4px; /* small elements */
+  --radius-card: 8px; /* cards */
+  --radius-shell: 28px; /* the sidebar card's outer frame */
+  --radius-inner: 22px; /* the portrait framed inside it */
 
-	/* Tracking */
-	--tracking-display: -0.02em; /* Inter Tight headings */
-	--tracking-label: 0.08em; /* uppercase mono labels */
+  /* Tracking */
+  --tracking-display: -0.02em; /* Inter Tight headings */
+  --tracking-label: 0.08em; /* uppercase mono labels */
 
-	/* Motion — the marquee is CSS because it must survive without JS */
-	--animate-marquee: marquee 40s linear infinite;
-	--animate-scroll-cue: scroll-cue 2.4s ease-in-out infinite;
-	--animate-status-pulse: status-pulse 2.4s ease-in-out infinite;
-	--animate-caret: caret 1.1s step-end infinite;
+  /* Motion — the marquee is CSS because it must survive without JS */
+  --animate-marquee: marquee 40s linear infinite;
+  --animate-scroll-cue: scroll-cue 2.4s ease-in-out infinite;
+  --animate-status-pulse: status-pulse 2.4s ease-in-out infinite;
+  --animate-caret: caret 1.1s step-end infinite;
 }
 
 @keyframes marquee {
-	from {
-		transform: translateX(0);
-	}
-	/* The track is rendered twice; -50% lands exactly on the seam. */
-	to {
-		transform: translateX(-50%);
-	}
+  from {
+    transform: translateX(0);
+  }
+  /* The track is rendered twice; -50% lands exactly on the seam. */
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 /* The availability dot breathes rather than blinks — a hard blink reads as an
    alert, a slow pulse reads as a heartbeat. */
 @keyframes status-pulse {
-	0%,
-	100% {
-		opacity: 1;
-		box-shadow: 0 0 0 0 rgb(0 229 199 / 0.45);
-	}
-	50% {
-		opacity: 0.65;
-		box-shadow: 0 0 0 4px rgb(0 229 199 / 0);
-	}
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgb(0 229 199 / 0.45);
+  }
+  50% {
+    opacity: 0.65;
+    box-shadow: 0 0 0 4px rgb(0 229 199 / 0);
+  }
 }
 
 @keyframes caret {
-	0%,
-	100% {
-		opacity: 1;
-	}
-	50% {
-		opacity: 0;
-	}
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 
 @keyframes scroll-cue {
-	0%,
-	100% {
-		transform: translateY(0);
-	}
-	50% {
-		transform: translateY(2px);
-	}
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(2px);
+  }
 }
 
 /* `inline` so the font utilities resolve the next/font variables at use site */
 @theme inline {
-	--font-display: var(--font-inter-tight);
-	--font-sans: var(--font-inter);
-	--font-mono: var(--font-jetbrains-mono);
+  --font-display: var(--font-inter-tight);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
 }
 
 @layer base {
-	:root {
-		color-scheme: dark;
-	}
+  :root {
+    color-scheme: dark;
+  }
 
-	/* Hairline borders are the primary structural device — default them to the
+  /* Hairline borders are the primary structural device — default them to the
 	   border token so `border` alone is correct without repeating the color. */
-	*,
-	::after,
-	::before {
-		border-color: var(--color-border);
-	}
+  *,
+  ::after,
+  ::before {
+    border-color: var(--color-border);
+  }
 
-	body {
-		background-color: var(--color-base);
-		color: var(--color-fg);
-		font-family: var(--font-sans);
-		line-height: 1.6;
-	}
+  body {
+    background-color: var(--color-base);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+  }
 
-	h1,
-	h2,
-	h3,
-	h4,
-	h5,
-	h6 {
-		font-family: var(--font-display);
-		letter-spacing: var(--tracking-display);
-		line-height: 1.1;
-	}
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    letter-spacing: var(--tracking-display);
+    line-height: 1.1;
+  }
 
-	:focus-visible {
-		outline: 2px solid var(--color-accent);
-		outline-offset: 2px;
-	}
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
 
-	::selection {
-		background-color: var(--color-accent);
-		color: var(--color-base);
-	}
+  ::selection {
+    background-color: var(--color-accent);
+    color: var(--color-base);
+  }
 
-	/* Non-negotiable: every effect on this site is opt-out at the OS level. */
-	@media (prefers-reduced-motion: reduce) {
-		*,
-		::before,
-		::after {
-			animation-duration: 0.01ms !important;
-			animation-iteration-count: 1 !important;
-			transition-duration: 0.01ms !important;
-			scroll-behavior: auto !important;
-		}
-	}
+  /* Non-negotiable: every effect on this site is opt-out at the OS level. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
 /* ---------------------------------------------------------------------------
@@ -145,25 +145,25 @@
 /* Horizontal rhythm for the content column. Vertical rhythm is per-section:
    the hero centres itself in the viewport, later sections use 120px+ gaps. */
 @utility section-padding {
-	padding-inline: 1.5rem;
+  padding-inline: 1.5rem;
 
-	@media (width >= 48rem) {
-		padding-inline: 3rem;
-	}
+  @media (width >= 48rem) {
+    padding-inline: 3rem;
+  }
 
-	@media (width >= 64rem) {
-		padding-inline: 4rem;
-	}
+  @media (width >= 64rem) {
+    padding-inline: 4rem;
+  }
 }
 
 /* Faint page grid. Sits beneath the hero glow at 0.02–0.03 opacity — texture,
    not decoration. */
 @utility page-grid {
-	background-image:
-		linear-gradient(to right, var(--color-border) 1px, transparent 1px),
-		linear-gradient(to bottom, var(--color-border) 1px, transparent 1px);
-	background-size: 72px 72px;
-	opacity: 0.03;
+  background-image:
+    linear-gradient(to right, var(--color-border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-border) 1px, transparent 1px);
+  background-size: 72px 72px;
+  opacity: 0.03;
 }
 
 /* Ambient accent light, one hue only. Three sources rather than one so the
@@ -172,31 +172,13 @@
    sheen under the stat row. Peak opacity stays at 0.10 — the interest comes
    from placement, not intensity. No second hue, no rings, no blobs. */
 @utility hero-glow {
-	background-image:
-		radial-gradient(
-			120% 90% at 12% 100%,
-			rgb(0 229 199 / 0.11) 0%,
-			transparent 58%
-		),
-		radial-gradient(
-			75% 55% at 95% 4%,
-			rgb(0 229 199 / 0.06) 0%,
-			transparent 62%
-		),
-		radial-gradient(
-			60% 45% at 68% 72%,
-			rgb(0 229 199 / 0.04) 0%,
-			transparent 70%
-		);
+  background-image:
+    radial-gradient(120% 90% at 12% 100%, rgb(0 229 199 / 0.11) 0%, transparent 58%),
+    radial-gradient(75% 55% at 95% 4%, rgb(0 229 199 / 0.06) 0%, transparent 62%),
+    radial-gradient(60% 45% at 68% 72%, rgb(0 229 199 / 0.04) 0%, transparent 70%);
 }
 
 /* Fades the marquee into the column edges instead of clipping it. */
 @utility marquee-mask {
-	mask-image: linear-gradient(
-		to right,
-		transparent,
-		black 10%,
-		black 90%,
-		transparent
-	);
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
 }

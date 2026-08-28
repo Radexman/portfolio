@@ -52,10 +52,7 @@ interface FeaturedProjectCardProps {
   index: number
 }
 
-export function FeaturedProjectCard({
-  project,
-  index,
-}: FeaturedProjectCardProps) {
+export function FeaturedProjectCard({ project, index }: FeaturedProjectCardProps) {
   const cardRef = useRef<HTMLElement>(null)
   const figureRef = useRef<HTMLElement>(null)
   const { setPayload } = useSectionObserverContext()
@@ -63,7 +60,7 @@ export function FeaturedProjectCard({
   // Dangling references resolve to null in `stack[]->name`.
   const stack = useMemo(
     () => (project.stack ?? []).filter((name): name is string => Boolean(name)),
-    [project.stack]
+    [project.stack],
   )
 
   const payload = useMemo(
@@ -73,7 +70,7 @@ export function FeaturedProjectCard({
       year: project.year,
       stack,
     }),
-    [project.role, project.company, project.year, stack]
+    [project.role, project.company, project.year, stack],
   )
 
   /**
@@ -92,7 +89,7 @@ export function FeaturedProjectCard({
       ([entry]) => {
         if (entry.isIntersecting) setPayload(SECTION_ID, payload)
       },
-      { rootMargin: CARD_ROOT_MARGIN }
+      { rootMargin: CARD_ROOT_MARGIN },
     )
 
     observer.observe(element)
@@ -115,43 +112,32 @@ export function FeaturedProjectCard({
 
         timeline
           .from('[data-card="figure"]', { opacity: 0, y: 40, duration: 0.7 }, 0)
-          .from(
-            '[data-card="text"] > *',
-            { opacity: 0, y: 24, duration: 0.5, stagger: 0.06 },
-            0.15
-          )
-          .from(
-            '[data-card="tag"]',
-            { opacity: 0, y: 12, duration: 0.4, stagger: 0.04 },
-            0.4
-          )
+          .from('[data-card="text"] > *', { opacity: 0, y: 24, duration: 0.5, stagger: 0.06 }, 0.15)
+          .from('[data-card="tag"]', { opacity: 0, y: 12, duration: 0.4, stagger: 0.04 }, 0.4)
       })
 
       // Parallax is depth, not movement — and on a phone it costs more than it
       // gives, so it is scoped to the breakpoint where the frame is large.
-      mm.add(
-        '(prefers-reduced-motion: no-preference) and (min-width: 48rem)',
-        () => {
-          gsap.fromTo(
-            '[data-card="image"]',
-            { yPercent: -6 },
-            {
-              yPercent: 6,
-              ease: 'none',
-              scrollTrigger: {
-                trigger: figureRef.current,
-                start: 'top bottom',
-                end: 'bottom top',
-                scrub: 0.6,
-              },
-            }
-          )
-        }
-      )
+      mm.add('(prefers-reduced-motion: no-preference) and (min-width: 48rem)', () => {
+        gsap.fromTo(
+          '[data-card="image"]',
+          { yPercent: -6 },
+          {
+            yPercent: 6,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: figureRef.current,
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: 0.6,
+            },
+          },
+        )
+      })
 
       return () => mm.revert()
     },
-    { scope: cardRef }
+    { scope: cardRef },
   )
 
   const coverUrl = project.coverImage?.asset
@@ -199,7 +185,7 @@ export function FeaturedProjectCard({
             aria-hidden="true"
             className="absolute inset-0 grid scale-[1.08] place-items-center bg-surface-raised"
           >
-            <span className="font-mono text-[11px] uppercase tracking-label text-fg-muted">
+            <span className="font-mono text-[11px] tracking-label text-fg-muted uppercase">
               {'// screenshot pending'}
             </span>
           </div>
@@ -214,7 +200,7 @@ export function FeaturedProjectCard({
           {String(index + 1).padStart(2, '0')}
         </p>
 
-        <p className="mt-4 font-mono text-xs uppercase tracking-[0.18em] text-accent">
+        <p className="mt-4 font-mono text-xs tracking-[0.18em] text-accent uppercase">
           {THESIS_LABELS[project.thesis] ?? project.thesis}
         </p>
 
@@ -222,13 +208,11 @@ export function FeaturedProjectCard({
           {project.title}
         </h3>
 
-        <p className="mt-3 font-mono text-[11px] uppercase tracking-widest text-fg-muted">
+        <p className="mt-3 font-mono text-[11px] tracking-widest text-fg-muted uppercase">
           {project.role} · {project.company} · {project.year}
         </p>
 
-        <p className="mt-5 max-w-md text-base leading-relaxed text-fg-muted">
-          {problemLine}
-        </p>
+        <p className="mt-5 max-w-md leading-relaxed text-base text-fg-muted">{problemLine}</p>
 
         {stack.length > 0 && (
           <ul className="mt-6 flex flex-wrap gap-2">
@@ -240,8 +224,8 @@ export function FeaturedProjectCard({
                 // line of its own on a narrow screen.
                 className={
                   tagIndex >= MAX_TAGS_MOBILE
-                    ? 'hidden rounded-sm border border-border bg-surface px-2.5 py-1 font-mono text-[11px] uppercase tracking-wider text-fg-muted md:block'
-                    : 'rounded-sm border border-border bg-surface px-2.5 py-1 font-mono text-[11px] uppercase tracking-wider text-fg-muted'
+                    ? 'hidden rounded-sm border border-border bg-surface px-2.5 py-1 font-mono text-[11px] tracking-wider text-fg-muted uppercase md:block'
+                    : 'rounded-sm border border-border bg-surface px-2.5 py-1 font-mono text-[11px] tracking-wider text-fg-muted uppercase'
                 }
               >
                 {name}
@@ -250,7 +234,7 @@ export function FeaturedProjectCard({
             {hiddenTagCount > 0 && (
               <li
                 data-card="tag"
-                className="rounded-sm border border-border bg-surface px-2.5 py-1 font-mono text-[11px] uppercase tracking-wider text-fg-muted"
+                className="rounded-sm border border-border bg-surface px-2.5 py-1 font-mono text-[11px] tracking-wider text-fg-muted uppercase"
               >
                 +{hiddenTagCount}
               </li>
@@ -259,15 +243,13 @@ export function FeaturedProjectCard({
         )}
 
         {project.designCredit && (
-          <p className="mt-4 font-mono text-[11px] text-fg-muted">
-            {project.designCredit}
-          </p>
+          <p className="mt-4 font-mono text-[11px] text-fg-muted">{project.designCredit}</p>
         )}
 
         <div className="mt-8 flex flex-wrap items-center gap-5">
           <Link
             href={`/work/${project.slug}`}
-            className="font-mono text-xs uppercase tracking-widest text-fg underline decoration-accent underline-offset-4 transition-colors hover:text-accent"
+            className="font-mono text-xs tracking-widest text-fg uppercase underline decoration-accent underline-offset-4 transition-colors hover:text-accent"
           >
             <span aria-hidden="true">→</span> case study
             <span className="sr-only"> for {project.title}</span>
@@ -283,9 +265,7 @@ export function FeaturedProjectCard({
               <span aria-hidden="true">↗</span> {hostnameOf(project.liveUrl)}
             </a>
           ) : (
-            fallbackLabel && (
-              <p className="font-mono text-xs text-fg-muted">{fallbackLabel}</p>
-            )
+            fallbackLabel && <p className="font-mono text-xs text-fg-muted">{fallbackLabel}</p>
           )}
         </div>
       </div>

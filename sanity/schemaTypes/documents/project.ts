@@ -66,8 +66,7 @@ export const project = defineType({
       name: 'order',
       title: 'Order',
       type: 'number',
-      description:
-        'Ascending. Controls ordering within Featured and within the archive.',
+      description: 'Ascending. Controls ordering within Featured and within the archive.',
       group: 'card',
       validation: (rule) => rule.required().integer().min(0),
     }),
@@ -75,8 +74,7 @@ export const project = defineType({
       name: 'thesis',
       title: 'Thesis',
       type: 'string',
-      description:
-        'The mono eyebrow. What this project argues that the others do not.',
+      description: 'The mono eyebrow. What this project argues that the others do not.',
       group: 'card',
       options: { list: [...PROJECT_THESES] },
       validation: (rule) => rule.required(),
@@ -112,17 +110,14 @@ export const project = defineType({
       description:
         'The first four render as tags on the card; all of them render in the sidebar readout.',
       group: 'card',
-      of: [
-        defineArrayMember({ type: 'reference', to: [{ type: 'technology' }] }),
-      ],
+      of: [defineArrayMember({ type: 'reference', to: [{ type: 'technology' }] })],
       validation: (rule) => rule.required().min(1).unique(),
     }),
     defineField({
       name: 'visibility',
       title: 'Visibility',
       type: 'string',
-      description:
-        'Drives the link row. Never publish an *.azurewebsites.net URL.',
+      description: 'Drives the link row. Never publish an *.azurewebsites.net URL.',
       group: 'card',
       options: { list: [...PROJECT_VISIBILITIES], layout: 'radio' },
       initialValue: 'public',
@@ -132,8 +127,7 @@ export const project = defineType({
       name: 'liveUrl',
       title: 'Live URL',
       type: 'url',
-      description:
-        'Only used when visibility is "public". A verified custom domain.',
+      description: 'Only used when visibility is "public". A verified custom domain.',
       group: 'card',
       hidden: ({ document }) => document?.visibility !== 'public',
       validation: (rule) =>
@@ -182,8 +176,7 @@ export const project = defineType({
       title: 'Problem',
       type: 'text',
       rows: 4,
-      description:
-        'The first sentence renders as the card line, so make it stand alone.',
+      description: 'The first sentence renders as the card line, so make it stand alone.',
       group: 'caseStudy',
       validation: (rule) => rule.required(),
     }),
@@ -205,8 +198,7 @@ export const project = defineType({
       name: 'designCredit',
       title: 'Design credit',
       type: 'string',
-      description:
-        'e.g. "Design: client-supplied". Stating it reads as confident, not defensive.',
+      description: 'e.g. "Design: client-supplied". Stating it reads as confident, not defensive.',
       group: 'caseStudy',
     }),
   ],

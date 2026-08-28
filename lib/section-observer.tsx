@@ -53,10 +53,9 @@ export function SectionObserverProvider({ children }: { children: ReactNode }) {
     if (visible.length === 0) return
 
     const first = visible.reduce((winner, candidate) =>
-      winner.compareDocumentPosition(candidate) &
-      Node.DOCUMENT_POSITION_PRECEDING
+      winner.compareDocumentPosition(candidate) & Node.DOCUMENT_POSITION_PRECEDING
         ? candidate
-        : winner
+        : winner,
     )
 
     const id = idsRef.current.get(first)
@@ -77,7 +76,7 @@ export function SectionObserverProvider({ children }: { children: ReactNode }) {
         }
         resolveActive()
       },
-      { rootMargin: ROOT_MARGIN }
+      { rootMargin: ROOT_MARGIN },
     )
 
     return observerRef.current
@@ -95,7 +94,7 @@ export function SectionObserverProvider({ children }: { children: ReactNode }) {
         visibleRef.current.delete(element)
       }
     },
-    [getObserver]
+    [getObserver],
   )
 
   // Lets setPayload read the active section without depending on it, so the
@@ -107,9 +106,7 @@ export function SectionObserverProvider({ children }: { children: ReactNode }) {
 
   const setPayload = useCallback((id: string, payload: SectionPayload) => {
     payloadsRef.current.set(id, payload)
-    setActivePayload((current) =>
-      id === activeSectionRef.current ? payload : current
-    )
+    setActivePayload((current) => (id === activeSectionRef.current ? payload : current))
   }, [])
 
   useEffect(() => {
@@ -121,22 +118,16 @@ export function SectionObserverProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<SectionObserverValue>(
     () => ({ activeSection, activePayload, register, setPayload }),
-    [activeSection, activePayload, register, setPayload]
+    [activeSection, activePayload, register, setPayload],
   )
 
-  return (
-    <SectionObserverContext.Provider value={value}>
-      {children}
-    </SectionObserverContext.Provider>
-  )
+  return <SectionObserverContext.Provider value={value}>{children}</SectionObserverContext.Provider>
 }
 
 export function useSectionObserverContext() {
   const context = useContext(SectionObserverContext)
   if (!context) {
-    throw new Error(
-      'useSectionObserverContext must be used inside a SectionObserverProvider'
-    )
+    throw new Error('useSectionObserverContext must be used inside a SectionObserverProvider')
   }
   return context
 }
@@ -150,7 +141,7 @@ export function useSectionObserverContext() {
  */
 export function useSectionObserver<T extends HTMLElement = HTMLElement>(
   id: string,
-  payload: SectionPayload = null
+  payload: SectionPayload = null,
 ) {
   const { register, setPayload } = useSectionObserverContext()
   const ref = useRef<T | null>(null)

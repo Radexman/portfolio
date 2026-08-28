@@ -14,10 +14,7 @@ export const SINGLETON_TYPES = ['heroSection', 'featuredWorkSection'] as const
  */
 const CURATED_TYPES = ['project', 'technology'] as const
 
-const HIDDEN_FROM_GENERATED_LIST: readonly string[] = [
-  ...SINGLETON_TYPES,
-  ...CURATED_TYPES,
-]
+const HIDDEN_FROM_GENERATED_LIST: readonly string[] = [...SINGLETON_TYPES, ...CURATED_TYPES]
 
 export const structure: StructureResolver = (S) => {
   // Types with no hand-built entry yet, so a new schema is reachable the
@@ -34,12 +31,7 @@ export const structure: StructureResolver = (S) => {
         .id('heroSection')
         .schemaType('heroSection')
         .title('Hero section')
-        .child(
-          S.editor()
-            .id('heroSection')
-            .schemaType('heroSection')
-            .documentId('heroSection')
-        ),
+        .child(S.editor().id('heroSection').schemaType('heroSection').documentId('heroSection')),
       S.listItem()
         .id('featuredWorkSection')
         .schemaType('featuredWorkSection')
@@ -48,7 +40,7 @@ export const structure: StructureResolver = (S) => {
           S.editor()
             .id('featuredWorkSection')
             .schemaType('featuredWorkSection')
-            .documentId('featuredWorkSection')
+            .documentId('featuredWorkSection'),
         ),
       S.divider(),
       // Featured is a filtered view of the same documents, not a separate type:
@@ -61,7 +53,7 @@ export const structure: StructureResolver = (S) => {
           S.documentTypeList('project')
             .title('Featured projects')
             .filter('_type == "project" && featured == true')
-            .defaultOrdering([{ field: 'order', direction: 'asc' }])
+            .defaultOrdering([{ field: 'order', direction: 'asc' }]),
         ),
       S.listItem()
         .id('allProjects')
@@ -70,7 +62,7 @@ export const structure: StructureResolver = (S) => {
         .child(
           S.documentTypeList('project')
             .title('All projects')
-            .defaultOrdering([{ field: 'order', direction: 'asc' }])
+            .defaultOrdering([{ field: 'order', direction: 'asc' }]),
         ),
       S.listItem()
         .id('technologies')
@@ -79,7 +71,7 @@ export const structure: StructureResolver = (S) => {
         .child(
           S.documentTypeList('technology')
             .title('Technologies')
-            .defaultOrdering([{ field: 'name', direction: 'asc' }])
+            .defaultOrdering([{ field: 'name', direction: 'asc' }]),
         ),
       // Only show the divider when there is something below it.
       ...(generated.length > 0 ? [S.divider(), ...generated] : []),

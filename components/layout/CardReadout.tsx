@@ -8,10 +8,7 @@ import {
   FeaturedWorkReadout,
   isFeaturedWorkPayload,
 } from '@/components/layout/readouts/FeaturedWorkReadout'
-import {
-  useSectionObserverContext,
-  type SectionPayload,
-} from '@/lib/section-observer'
+import { useSectionObserverContext, type SectionPayload } from '@/lib/section-observer'
 import { useMediaQuery } from '@/lib/use-media-query'
 
 gsap.registerPlugin(useGSAP)
@@ -27,14 +24,9 @@ gsap.registerPlugin(useGSAP)
  * Each variant is responsible for its own fixed height. The slot itself must
  * not reserve any, or the card's greeting is pushed off-centre at the hero.
  */
-const READOUT_VARIANTS: Record<
-  string,
-  (payload: SectionPayload) => ReactNode | null
-> = {
+const READOUT_VARIANTS: Record<string, (payload: SectionPayload) => ReactNode | null> = {
   work: (payload) =>
-    isFeaturedWorkPayload(payload) ? (
-      <FeaturedWorkReadout payload={payload} />
-    ) : null,
+    isFeaturedWorkPayload(payload) ? <FeaturedWorkReadout payload={payload} /> : null,
 }
 
 export function CardReadout() {
@@ -90,7 +82,7 @@ export function CardReadout() {
           timeline.fromTo(
             element,
             { opacity: 0, y: 4 },
-            { opacity: 1, y: 0, duration: 0.18, ease: 'power2.out' }
+            { opacity: 1, y: 0, duration: 0.18, ease: 'power2.out' },
           )
         } else {
           // Emptied, not hidden — leave the slot in a clean state for next time.
@@ -102,7 +94,7 @@ export function CardReadout() {
     },
     // `isDesktop` is a dependency because the container does not exist until it
     // flips true after hydration — without it the first swap would find no ref.
-    { scope: containerRef, dependencies: [nextKey, isDesktop] }
+    { scope: containerRef, dependencies: [nextKey, isDesktop] },
   )
 
   if (!isDesktop) return null

@@ -77,11 +77,11 @@ Icons are inline SVG mapped from `platform` in code — do not store icon images
 **Ticker:**
 
 | Name                  | isCurrent |
-| --------------------- | ---------- |
-| Giganci Programowania | false      |
-| Jointhubs             | false      |
-| Hued.me               | false      |
-| Booksy                | true       |
+| --------------------- | --------- |
+| Giganci Programowania | false     |
+| Jointhubs             | false     |
+| Hued.me               | false     |
+| Booksy                | true      |
 
 **Current focus:** label `"CURRENT FOCUS"`, statement `"Shipping calmer interfaces."`, tags `["React", "TypeScript", "Product thinking"]`
 
@@ -111,9 +111,9 @@ The hero registers with `id: "hero"` and a `null` payload — at hero the card s
 ## Component Requirements
 
 - Files:
-    - `src/components/layout/SplitLayout.tsx`
-    - `src/components/layout/SidebarCard.tsx`
-    - `src/components/sections/HeroSection.tsx`
+  - `src/components/layout/SplitLayout.tsx`
+  - `src/components/layout/SidebarCard.tsx`
+  - `src/components/sections/HeroSection.tsx`
 - Section background: `bg-base` (`#0A0B0E`)
 - Right column applies `.section-padding`; hero is the one section that runs full viewport height (`min-h-svh`) with content vertically centered
 - Data: fetch the `heroSection` singleton via GROQ in the server component, pass down as props. `SidebarCard` is a client component (needs observer context); keep the fetch above it.
@@ -128,11 +128,11 @@ The hero registers with `id: "hero"` and a `null` payload — at hero the card s
 - **Monogram**: `absolute top-4 left-4`, mono, `text-sm font-medium text-fg/80`
 - **Socials**: `absolute top-4 right-4`, vertical `flex flex-col gap-2`. Each: `size-9 rounded-sm bg-surface-raised border border-border grid place-items-center text-fg-muted hover:text-accent hover:border-accent transition-colors`
 - **Content block**, `absolute inset-x-0 bottom-0 p-5`:
-    - Status badge: `inline-flex items-center gap-2`, `size-1.5 rounded-full bg-accent`, label in mono `text-[11px] tracking-wider uppercase text-fg-muted`
-    - Greeting: `font-display text-xl font-semibold text-fg mt-3`
-    - Bio: `text-sm text-fg-muted mt-2 leading-relaxed`
-    - `hr` in `border-border` `my-4`
-    - CTA row: primary as `rounded-full bg-accent text-base px-5 py-2.5 text-sm font-medium` with a `↗` glyph; secondary as `text-sm text-fg-muted hover:text-fg` with a document icon
+  - Status badge: `inline-flex items-center gap-2`, `size-1.5 rounded-full bg-accent`, label in mono `text-[11px] tracking-wider uppercase text-fg-muted`
+  - Greeting: `font-display text-xl font-semibold text-fg mt-3`
+  - Bio: `text-sm text-fg-muted mt-2 leading-relaxed`
+  - `hr` in `border-border` `my-4`
+  - CTA row: primary as `rounded-full bg-accent text-base px-5 py-2.5 text-sm font-medium` with a `↗` glyph; secondary as `text-sm text-fg-muted hover:text-fg` with a document icon
 - **Readout slot**: an empty, fixed-height `div` rendered between the bio and the CTA row, `min-h-[4.5rem]`, hidden at hero. Reserve the space now so later sections don't cause the card to reflow when the readout mounts.
 
 ### Hero Content (right column)
@@ -143,19 +143,19 @@ Vertical stack, `max-w-2xl`, `gap` handled per-block:
 2. **Headline** — `font-display font-bold tracking-[-0.02em] leading-[0.95]`, `text-5xl md:text-6xl lg:text-7xl`, `mt-6`. `headlineLead` in `text-fg`, `headlineAccent` in `text-accent` on its own line
 3. **Subheadline** — `text-base md:text-lg text-fg-muted mt-6 max-w-lg leading-relaxed`
 4. **Current focus panel** — `mt-10 border border-border border-l-2 border-l-accent bg-surface/60 rounded-r-lg p-5 max-w-md`
-    - Label row: `size-1.5 rounded-full bg-accent` + mono `text-[11px] tracking-widest uppercase text-fg-muted`
-    - Statement: `font-display text-base font-semibold text-fg mt-2`
-    - Tags: mono `text-[11px] tracking-widest uppercase text-fg-muted mt-2`, joined with `·`
+   - Label row: `size-1.5 rounded-full bg-accent` + mono `text-[11px] tracking-widest uppercase text-fg-muted`
+   - Statement: `font-display text-base font-semibold text-fg mt-2`
+   - Tags: mono `text-[11px] tracking-widest uppercase text-fg-muted mt-2`, joined with `·`
 5. **Availability row** — `mt-6 flex items-center justify-between max-w-md`
-    - Note: mono `text-xs text-fg-muted`
-    - Work CTA: mono `text-xs text-fg underline underline-offset-4 decoration-accent hover:text-accent transition-colors` with `↗`
+   - Note: mono `text-xs text-fg-muted`
+   - Work CTA: mono `text-xs text-fg underline underline-offset-4 decoration-accent hover:text-accent transition-colors` with `↗`
 6. **Stat row** — `mt-12 grid grid-cols-4 gap-6 max-w-lg`
-    - Value: `font-display text-4xl font-bold text-fg tabular-nums`
-    - Label: mono `text-[10px] tracking-widest uppercase text-fg-muted mt-1`
+   - Value: `font-display text-4xl font-bold text-fg tabular-nums`
+   - Label: mono `text-[10px] tracking-widest uppercase text-fg-muted mt-1`
 7. **Ticker** — `mt-12`, full width of the content column, masked at both edges with `[mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]`
-    - Items in `font-display text-2xl md:text-3xl font-semibold`, separated by a `·` in `text-fg-muted`
-    - Normal items: `text-fg-muted`. `isCurrent` items: `text-accent`, no prefix
-    - Continuous horizontal marquee, duplicated track, `animation: marquee 40s linear infinite`, pauses on hover
+   - Items in `font-display text-2xl md:text-3xl font-semibold`, separated by a `·` in `text-fg-muted`
+   - Normal items: `text-fg-muted`. `isCurrent` items: `text-accent`, no prefix
+   - Continuous horizontal marquee, duplicated track, `animation: marquee 40s linear infinite`, pauses on hover
 8. **Scroll cue** — `absolute bottom-8`, mono `text-xs text-fg-muted` + `↓`, gentle 2px vertical loop
 
 ---
@@ -220,10 +220,10 @@ Use gsap with the `useGSAP` hook (`gsap`, `@gsap/react`) — the only animation 
 - **`lg` (1024px+)** — the 1/3 – 2/3 split. Card sticky and vertically centered. Divider visible.
 - **`md`** — single column. Card becomes a full-width block at the top, `aspect-[4/3]`, then scrolls away. Hero content follows beneath at full width.
 - **`< md`** — card fills the first viewport (`min-h-svh`), portrait as the background with the scrim, content block anchored to the bottom. Hero content starts on the second screen. Headline drops to `text-4xl`.
-    - Stat row becomes `grid-cols-2 gap-y-8`
-    - Availability row stacks
-    - Ticker font drops to `text-xl`
-    - **Card is never sticky below `lg`** — at 380px it would consume a third of the viewport permanently. The sticky mobile bottom bar that replaces it is out of scope here and specified with the global layout.
+  - Stat row becomes `grid-cols-2 gap-y-8`
+  - Availability row stacks
+  - Ticker font drops to `text-xl`
+  - **Card is never sticky below `lg`** — at 380px it would consume a third of the viewport permanently. The sticky mobile bottom bar that replaces it is out of scope here and specified with the global layout.
 
 ---
 

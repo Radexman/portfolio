@@ -32,11 +32,7 @@ export async function FeaturedWorkSection() {
     <FeaturedWorkShell copy={section ?? FALLBACK_COPY}>
       {/* Whatever exists renders — the section is never padded to three. */}
       {projects.map((project, index) => (
-        <FeaturedProjectCard
-          key={project._id}
-          project={project}
-          index={index}
-        />
+        <FeaturedProjectCard key={project._id} project={project} index={index} />
       ))}
     </FeaturedWorkShell>
   )

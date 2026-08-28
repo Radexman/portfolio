@@ -28,8 +28,7 @@ export const socialLink = defineType({
       name: 'url',
       title: 'URL',
       type: 'url',
-      validation: (rule) =>
-        rule.required().uri({ scheme: ['http', 'https', 'mailto'] }),
+      validation: (rule) => rule.required().uri({ scheme: ['http', 'https', 'mailto'] }),
     }),
   ],
   preview: {
