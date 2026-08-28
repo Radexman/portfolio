@@ -151,12 +151,32 @@
 @utility section-padding {
   padding-inline: 1.5rem;
 
+  /* From md up the navigation pill is fixed to the right edge, so the inline-end
+     side reserves room for it. Padding rather than a margin on the column: the
+     section backgrounds stay full-bleed behind the rail. */
   @media (width >= 48rem) {
     padding-inline: 3rem;
+    padding-inline-end: 5.5rem;
   }
 
   @media (width >= 64rem) {
     padding-inline: 4rem;
+    padding-inline-end: 6rem;
+  }
+}
+
+/* The rail only scrolls on viewports too short to hold it. Above that it must
+   not scroll at all: an overflow container would clip the link tooltips, which
+   sit outside the pill. */
+@utility nav-rail {
+  @media (height < 40rem) {
+    max-height: 70svh;
+    overflow-y: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 }
 
