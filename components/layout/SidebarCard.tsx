@@ -95,7 +95,7 @@ export function SidebarCard({
       ref={cardRef}
       className="relative w-full rounded-shell border border-border bg-surface/40 p-2 lg:max-h-[calc(100svh-4rem)]"
     >
-      <div className="relative isolate min-h-[calc(100svh-2rem)] overflow-hidden rounded-inner border border-border/60 bg-surface md:aspect-[4/3] md:min-h-0 lg:aspect-[3/4]">
+      <div className="relative isolate min-h-[calc(100svh-13rem)] overflow-hidden rounded-inner border border-border/60 bg-surface md:aspect-[4/3] md:min-h-0 lg:aspect-[3/4]">
         {portraitUrl ? (
           <Image
             src={portraitUrl}
@@ -115,7 +115,9 @@ export function SidebarCard({
           className="absolute inset-0 bg-gradient-to-t from-base via-base/75 to-transparent"
         />
 
-        <div className="absolute top-5 left-5">
+        {/* The mobile top bar carries the monogram below md; two of them would
+            sit within 60px of each other. */}
+        <div className="absolute top-5 left-5 max-md:hidden">
           <Monogram value={monogram} />
         </div>
 
@@ -177,13 +179,13 @@ export function SidebarCard({
                     href={primaryCta.href}
                     aria-label={primaryCta.label}
                     tabIndex={-1}
-                    className="grid size-11 shrink-0 place-items-center rounded-full bg-accent text-base transition-opacity hover:opacity-90"
+                    className="grid size-11 shrink-0 place-items-center rounded-full bg-accent text-base transition-opacity max-sm:hidden hover:opacity-90"
                   >
                     <ArrowUpRightIcon />
                   </a>
                   <a
                     href={primaryCta.href}
-                    className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-base transition-opacity hover:opacity-90"
+                    className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium whitespace-nowrap text-base transition-opacity hover:opacity-90"
                   >
                     {primaryCta.label}
                   </a>
@@ -192,7 +194,7 @@ export function SidebarCard({
               {secondaryCta && (
                 <a
                   href={secondaryCta.href}
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-fg transition-colors hover:text-accent"
+                  className="inline-flex items-center gap-2 text-sm font-semibold whitespace-nowrap text-fg transition-colors hover:text-accent"
                 >
                   <DocumentIcon />
                   {secondaryCta.label}

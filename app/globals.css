@@ -180,6 +180,17 @@
   }
 }
 
+/* The mobile menu only overflows in short landscape viewports, but the cap is
+   unconditional — a visible scrollbar inside a 240px dropdown is never wanted. */
+@utility menu-scroll {
+  overflow-y: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /* Faint page grid. Sits beneath the hero glow at 0.02–0.03 opacity — texture,
    not decoration. */
 @utility page-grid {

@@ -38,6 +38,7 @@ export default async function HomePage() {
 
   return (
     <SplitLayout
+      monogram={hero.monogram}
       sidebar={
         <SidebarCard
           portrait={hero.portrait}
