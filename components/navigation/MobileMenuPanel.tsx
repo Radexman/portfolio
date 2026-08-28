@@ -33,7 +33,7 @@ export function MobileMenuPanel({
         aria-modal="true"
         aria-label="Site navigation"
         onClick={(event) => event.stopPropagation()}
-        className="menu-scroll absolute top-16 right-4 max-h-[calc(100svh-6rem)] w-[min(15rem,calc(100vw-2rem))] origin-top-right rounded-2xl border border-border bg-surface/95 p-2 backdrop-blur-xl"
+        className="absolute top-16 right-4 menu-scroll max-h-[calc(100svh-6rem)] w-[min(15rem,calc(100vw-2rem))] origin-top-right rounded-2xl border border-border bg-surface/95 p-2 backdrop-blur-xl"
       >
         <nav>
           <ul>

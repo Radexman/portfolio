@@ -179,7 +179,7 @@ export function SidebarCard({
                     href={primaryCta.href}
                     aria-label={primaryCta.label}
                     tabIndex={-1}
-                    className="grid size-11 shrink-0 place-items-center rounded-full bg-accent text-base transition-opacity max-sm:hidden hover:opacity-90"
+                    className="grid size-11 shrink-0 place-items-center rounded-full bg-accent text-base transition-opacity hover:opacity-90 max-sm:hidden"
                   >
                     <ArrowUpRightIcon />
                   </a>

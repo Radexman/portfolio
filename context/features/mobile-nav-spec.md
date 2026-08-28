@@ -17,6 +17,7 @@ Visual references:
 - `@context/screenshots/hamburger-modal.png` — the open menu panel
 
 > **Two deviations from the reference screenshots**, both deliberate:
+>
 > - **No date/time display.** The `Fri, Aug 28 10:55` block in the top bar is not built.
 > - **No second gear button** below the hamburger. The reference shows a settings-style icon there; the only settings control is the theme toggle in the bottom stack.
 
@@ -28,16 +29,16 @@ Reuses `NAV_ITEMS` from `@src/lib/navigation.ts` unchanged. The mobile menu and 
 
 The reference screenshot shows template labels (About, Education, Services, Testimonials). Ignore those; render `NAV_ITEMS` as defined:
 
-| Order | `id` | Label | Icon |
-| --- | --- | --- | --- |
-| 1 | `hero` | Home | `house` |
-| 2 | `work` | Selected work | `briefcase` |
-| 3 | `timeline` | Career | `git-branch` |
-| 4 | `teaching` | Teaching | `graduation-cap` |
-| 5 | `skills` | Stack | `braces` |
-| 6 | `more-work` | More work | `layout-grid` |
-| 7 | `beekeeping` | Side project | `sprout` |
-| 8 | `contact` | Contact | `send` |
+| Order | `id`         | Label         | Icon             |
+| ----- | ------------ | ------------- | ---------------- |
+| 1     | `hero`       | Home          | `house`          |
+| 2     | `work`       | Selected work | `briefcase`      |
+| 3     | `timeline`   | Career        | `git-branch`     |
+| 4     | `teaching`   | Teaching      | `graduation-cap` |
+| 5     | `skills`     | Stack         | `braces`         |
+| 6     | `more-work`  | More work     | `layout-grid`    |
+| 7     | `beekeeping` | Side project  | `sprout`         |
+| 8     | `contact`    | Contact       | `send`           |
 
 ---
 
@@ -45,11 +46,11 @@ The reference screenshot shows template labels (About, Education, Services, Test
 
 Before building anything new, extract the pieces Phase 1 already solved. Do **not** duplicate their logic.
 
-| Extract to | From | Notes |
-| --- | --- | --- |
-| `src/components/navigation/ThemeToggle.tsx` | Phase 1 | Already standalone — add a `size` prop (`"md"` \| `"lg"`) |
-| `src/components/navigation/ScrollToTopButton.tsx` | Phase 1 | Already standalone — same `size` prop |
-| `src/lib/use-smooth-scroll.ts` | Phase 1 click handler | Shared hook wrapping the `ScrollToPlugin` tween, `autoKill: true`, reduced-motion branch |
+| Extract to                                        | From                  | Notes                                                                                    |
+| ------------------------------------------------- | --------------------- | ---------------------------------------------------------------------------------------- |
+| `src/components/navigation/ThemeToggle.tsx`       | Phase 1               | Already standalone — add a `size` prop (`"md"` \| `"lg"`)                                |
+| `src/components/navigation/ScrollToTopButton.tsx` | Phase 1               | Already standalone — same `size` prop                                                    |
+| `src/lib/use-smooth-scroll.ts`                    | Phase 1 click handler | Shared hook wrapping the `ScrollToPlugin` tween, `autoKill: true`, reduced-motion branch |
 
 Both nav layers then call one scroll implementation. A second copy will drift.
 
@@ -125,12 +126,12 @@ Ref: `hamburger-modal.png`
 
 ## Open / Close Behaviour
 
-| Trigger | Result |
-| --- | --- |
-| Hamburger click | Toggles |
-| Backdrop click | Closes |
-| `Escape` key | Closes, returns focus to the trigger |
-| Nav item click | Closes, then scrolls |
+| Trigger                   | Result                                |
+| ------------------------- | ------------------------------------- |
+| Hamburger click           | Toggles                               |
+| Backdrop click            | Closes                                |
+| `Escape` key              | Closes, returns focus to the trigger  |
+| Nav item click            | Closes, then scrolls                  |
 | Viewport crosses to `md+` | Closes immediately and unlocks scroll |
 
 That last row matters: rotating a phone to landscape can cross the breakpoint. If the panel stays mounted while the desktop pill appears, the page ends up with a locked body and no visible close control.
@@ -156,18 +157,18 @@ While open:
 ## GSAP Animations
 
 ```ts
-gsap.registerPlugin(useGSAP, ScrollToPlugin);
+gsap.registerPlugin(useGSAP, ScrollToPlugin)
 ```
 
 All animation inside `useGSAP(() => { … }, { scope: containerRef, dependencies: [isOpen] })`.
 
 ### Open
 
-| Target | From → To | Duration | Position |
-| --- | --- | --- | --- |
-| Backdrop | `opacity: 0 → 1` | `0.25` | `0` |
-| Panel | `opacity: 0 → 1`, `scale: 0.94 → 1`, `y: -8 → 0` | `0.3` | `0.05` |
-| Items | `opacity: 0 → 1`, `x: 8 → 0`, `stagger: 0.035` | `0.25` | `0.12` |
+| Target   | From → To                                        | Duration | Position |
+| -------- | ------------------------------------------------ | -------- | -------- |
+| Backdrop | `opacity: 0 → 1`                                 | `0.25`   | `0`      |
+| Panel    | `opacity: 0 → 1`, `scale: 0.94 → 1`, `y: -8 → 0` | `0.3`    | `0.05`   |
+| Items    | `opacity: 0 → 1`, `x: 8 → 0`, `stagger: 0.035`   | `0.25`   | `0.12`   |
 
 Panel eases with `back.out(1.4)` for a slight settle; everything else `power3.out`. Transform origin is the top-right corner so the panel reads as growing out of the trigger.
 
@@ -202,12 +203,12 @@ Not a scroll-scrubbed tween — a class toggle driven by a `scrollY > 32` check 
 
 ## Responsive
 
-| Breakpoint | Behaviour |
-| --- | --- |
-| `md` (768px+) | Renders `null`. `NavigationPill` takes over. |
-| `< md` | Top bar, control stack, and menu panel active |
-| `< 380px` | Panel width falls back to `calc(100vw-2rem)`; labels never truncate — if one would, shorten the label in `NAV_ITEMS` rather than clipping |
-| Landscape, `height < 480px` | Panel gets `max-h-[calc(100svh-6rem)] overflow-y-auto`, scrollbar hidden |
+| Breakpoint                  | Behaviour                                                                                                                                 |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `md` (768px+)               | Renders `null`. `NavigationPill` takes over.                                                                                              |
+| `< md`                      | Top bar, control stack, and menu panel active                                                                                             |
+| `< 380px`                   | Panel width falls back to `calc(100vw-2rem)`; labels never truncate — if one would, shorten the label in `NAV_ITEMS` rather than clipping |
+| Landscape, `height < 480px` | Panel gets `max-h-[calc(100svh-6rem)] overflow-y-auto`, scrollbar hidden                                                                  |
 
 Use `svh` units throughout, not `vh` — mobile browser chrome makes `vh` unreliable.
 
