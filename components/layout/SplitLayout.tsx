@@ -3,22 +3,12 @@ import type { ReactNode } from 'react'
 import { SectionObserverProvider } from '@/lib/section-observer'
 
 interface SplitLayoutProps {
-  /** The persistent card. Sticky and vertically centred at lg+ only. */
   sidebar: ReactNode
-  /** Page sections, in order. Each renders its own <section id="…">. */
   children: ReactNode
 }
 
-/**
- * The page's structural split: a 1/3 card column and a 2/3 content column.
- *
- * Built once here and reused by every later section — sections mount into the
- * content column and never re-create the grid.
- *
- * Below lg the grid collapses to a single column and the card scrolls away
- * with the page. It is deliberately never sticky there: at 380px wide it would
- * permanently occupy a third of the viewport.
- */
+// Below lg the card is never sticky: at 380px it would permanently occupy a
+// third of the viewport.
 export function SplitLayout({ sidebar, children }: SplitLayoutProps) {
   return (
     <SectionObserverProvider>

@@ -8,15 +8,12 @@ import { sanityFetch } from '@/sanity/lib/live'
 import { heroSectionQuery } from '@/sanity/lib/queries'
 import type { HeroSection as HeroSectionData } from '@/types/hero'
 
-// This content changes monthly at most.
 export const revalidate = 3600
 
 export default async function HomePage() {
   const { data } = await sanityFetch({ query: heroSectionQuery })
   const hero = data as HeroSectionData | null
 
-  // The singleton may not exist yet (fresh dataset, or an unpublished draft).
-  // Render a usable empty state rather than crashing the page.
   if (!hero) {
     return (
       <main className="flex min-h-svh items-center section-padding">

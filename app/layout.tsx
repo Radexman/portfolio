@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import { Inter, Inter_Tight, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 
-// next/font requires statically analyzable literals, so the subsets array is
-// repeated per call. latin-ext carries the diacritics in "Radosław Siek".
+// next/font needs statically analyzable literals, so subsets is repeated per
+// call. latin-ext carries the diacritics in "Radosław Siek".
 
 const interTight = Inter_Tight({
   variable: '--font-inter-tight',

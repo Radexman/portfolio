@@ -22,6 +22,10 @@
   --radius-shell: 28px; /* the sidebar card's outer frame */
   --radius-inner: 22px; /* the portrait framed inside it */
 
+  /* An offset accent block, not a glow: zero blur, so it reads as a second
+     rectangle behind the panel rather than a coloured drop shadow. */
+  --shadow-offset-accent: 10px 10px 0 0 rgb(0 229 199 / 0.1);
+
   /* Tracking */
   --tracking-display: -0.02em; /* Inter Tight headings */
   --tracking-label: 0.08em; /* uppercase mono labels */

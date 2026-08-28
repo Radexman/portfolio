@@ -1,16 +1,39 @@
-# Current Feature
+# Current Feature: Comment Cleanup + Current Focus Card
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Populated by /feature load -->
+- **Strip over-explicit commenting** from the components. Every file under `components/`, plus `lib/`, `types/` and `content/`, is carrying block comments that narrate what the code already says. Keep only the comments that record a non-obvious decision or a gotcha someone would otherwise reintroduce; delete the rest.
+- **Give the hero's Current Focus panel an outer shadow** so it lifts off the page background the way the reference screenshot shows.
+- **Change the Current Focus tags** to `Next.js`, `TypeScript`, `AI`.
 
 ## Notes
 
-<!-- Populated by /feature load -->
+**Scope of the comment pass.** Current comment-line counts, worst first:
+
+| File                                                 | Comment lines / total |
+| ---------------------------------------------------- | --------------------- |
+| `components/work/FeaturedProjectCard.tsx`            | 31 / 274              |
+| `lib/section-observer.tsx`                           | 24 / 160              |
+| `components/layout/CardReadout.tsx`                  | 21 / 103              |
+| `types/work.ts`                                      | 16 / 63               |
+| `components/layout/readouts/FeaturedWorkReadout.tsx` | 14 / 44               |
+| `content/work.ts`                                    | 14 / 29               |
+| `components/sections/FeaturedWorkSection.tsx`        | 12 / 39               |
+| `components/layout/SplitLayout.tsx`                  | 12 / 33               |
+
+The keep/cut test: a comment survives if deleting it would let someone silently break something. The three worth keeping across the codebase are already known — the Tailwind `scale-*` / GSAP `yPercent` interaction in `FeaturedProjectCard`, the "only push on enter, never clear on exit" rule in `FeaturedWorkShell`, and the `isDesktop` dependency in `CardReadout`. Everything that restates a prop name, re-describes a class list, or explains what `useGSAP` does goes.
+
+**The tags are CMS data, not code.** They live at `heroSection.currentFocus.tags` in Sanity, currently `["TypeScript", "Product thinking"]`. Changing them to `Next.js · TypeScript · AI` is a Studio edit (or an MCP patch), not an edit to `HeroSection.tsx`.
+
+**The label does not match the screenshot.** The reference reads `CURRENT FOCUS`; the published document says `CURRENT ROLE`, and the statement is `AI Native Software Engineering · Booksy` rather than `Shipping calmer interfaces.` The screenshot is a styling reference — confirm before changing copy, since the current copy is the Booksy positioning the page argues for.
+
+**The shadow has a design-system constraint.** @context/project-overview.md rules out colored drop shadows and glassmorphism, so this is a neutral, near-black shadow that reads as depth — not an accent glow around the left rail. The panel already carries `border-l-2 border-l-accent` and `rounded-r-card`; the shadow needs to sit under that without turning into the neon treatment the whole redesign exists to get away from.
+
+**Where the markup lives:** the panel is the `data-hero="focus"` block in `components/sections/HeroSection.tsx`, around line 200. It is one of the elements the hero's GSAP load timeline animates, so any wrapper change has to keep that `data-hero` hook intact.
 
 ## History
 

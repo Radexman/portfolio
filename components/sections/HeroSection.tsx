@@ -8,10 +8,6 @@ import type { HeroSection as HeroSectionData, TickerItem } from '@/types/hero'
 
 gsap.registerPlugin(useGSAP)
 
-/**
- * Splits "200+" into 200 and "+", so the count-up animates the number and
- * leaves any suffix alone. Returns null when there is no leading number.
- */
 function parseStatValue(value: string) {
   const match = /^(\d+)(.*)$/.exec(value.trim())
   if (!match) return null
@@ -23,7 +19,6 @@ function TickerTrack({ items }: { items: TickerItem[] }) {
     <span className="flex shrink-0 items-center">
       {items.map((item, index) => (
         <span key={`${item.name}-${index}`} className="flex items-center">
-          {/* The current employer is marked by colour alone — no arrow. */}
           <span
             className={
               item.isCurrent
@@ -47,8 +42,6 @@ export function HeroSection({ hero }: { hero: HeroSectionData }) {
 
   useGSAP(
     () => {
-      // Elements render in their final state; gsap sets the "from" state in a
-      // layout effect before paint. Under reduced motion this never runs.
       const mm = gsap.matchMedia()
 
       mm.add('(prefers-reduced-motion: no-preference)', () => {
@@ -131,7 +124,6 @@ export function HeroSection({ hero }: { hero: HeroSectionData }) {
             1,
           )
 
-        // Count-up runs alongside the stat stagger, once, never on scroll-back.
         const counters = gsap.utils.toArray<HTMLElement>('[data-countup]')
 
         for (const counter of counters) {
@@ -168,7 +160,6 @@ export function HeroSection({ hero }: { hero: HeroSectionData }) {
       id="hero"
       className="relative flex min-h-svh flex-col justify-center section-padding py-24 lg:py-0"
     >
-      {/* The single background effect, plus the page grid beneath it. */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 page-grid" />
         <div className="absolute inset-0 hero-glow" />
@@ -200,7 +191,7 @@ export function HeroSection({ hero }: { hero: HeroSectionData }) {
         {currentFocus && (
           <div
             data-hero="focus"
-            className="mt-10 max-w-md rounded-r-card border border-l-2 border-border border-l-accent bg-surface/60 p-5"
+            className="mt-10 max-w-md border border-l-2 border-border border-l-accent bg-surface/60 p-5 shadow-offset-accent"
           >
             <p className="flex items-center gap-2">
               <span aria-hidden="true" className="size-1.5 rounded-full bg-accent" />
@@ -258,7 +249,7 @@ export function HeroSection({ hero }: { hero: HeroSectionData }) {
       {hero.ticker.length > 0 && (
         <div data-hero="ticker" className="relative mt-12 overflow-hidden marquee-mask">
           <div className="flex w-max animate-marquee hover:[animation-play-state:paused]">
-            {/* Rendered twice so the -50% keyframe lands on a seamless seam */}
+            {/* Rendered twice so the -50% keyframe lands on a seamless seam. */}
             <TickerTrack items={hero.ticker} />
             <TickerTrack items={hero.ticker} />
           </div>
