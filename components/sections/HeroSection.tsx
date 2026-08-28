@@ -183,7 +183,7 @@ export function HeroSection({ hero }: { hero: HeroSectionData }) {
 
         <p
           data-hero="subheadline"
-          className="mt-6 max-w-lg leading-relaxed text-base text-fg-muted md:text-lg"
+          className="mt-6 max-w-lg leading-relaxed text-fg-muted md:text-lg"
         >
           {hero.subheadline}
         </p>
@@ -199,9 +199,7 @@ export function HeroSection({ hero }: { hero: HeroSectionData }) {
                 {currentFocus.label}
               </span>
             </p>
-            <p className="mt-2 font-display font-semibold text-base text-fg">
-              {currentFocus.statement}
-            </p>
+            <p className="mt-2 font-display font-semibold text-fg">{currentFocus.statement}</p>
             {currentFocus.tags && currentFocus.tags.length > 0 && (
               <p className="mt-2 font-mono text-[11px] tracking-label text-fg-muted uppercase">
                 {currentFocus.tags.join(' · ')}

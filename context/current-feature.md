@@ -1,16 +1,43 @@
-# Current Feature
+# Current Feature: Navigation Pill (Phase 1 — Desktop & Tablet)
+
+**Spec:** @context/features/navigation-pill-spec.md
+**Reference:** @context/screenshots/navigation-pill.png
 
 ## Status
 
-Not Started
+In Progress — branch `feature/navigation-pill`
+
+**Decision:** the theme toggle is **omitted**. The project spec's dark-only rule stands; no `next-themes`, no second palette. The rail ships as nav pill + scroll-to-top.
 
 ## Goals
 
-<!-- Populated by /feature load -->
+- **`lib/navigation.ts`** — `NavItem` type and a `NAV_ITEMS` constant of eight entries (`hero`/Home, `work`/Selected work, `timeline`/Career, `teaching`/Teaching, `skills`/Stack, `more-work`/More work, `beekeeping`/Side project, `contact`/Contact). Not CMS-managed; the list is structural.
+- **`components/icons/index.tsx`** — inline SVG icon components (Lucide paths, MIT), no `lucide-react` dependency. `24×24` viewBox, `currentColor` stroke, `strokeWidth={1.5}`, no fill, round caps/joins. Needed: `house`, `briefcase`, `git-branch`, `graduation-cap`, `braces`, `layout-grid`, `sprout`, `send`, `sun`, `moon`, `arrow-up`.
+- **`NavigationPill`** (client) — fixed right-edge rail, vertically centred, `z-40`, `hidden md:flex`. Mounted once in `SplitLayout` **outside** the grid columns so the sticky card's stacking context can't clip it.
+- **`NavPillLink`** — real `<a href="#{id}">` in a `<ul>`/`<li>`, `size-10`, `text-fg-muted` → hover `text-fg bg-surface-raised` → active `text-accent` plus a shared `2px` accent indicator bar and `aria-current="true"`. Tooltip to the left on hover and `:focus-visible`, mono uppercase, pointer-events none.
+- **`ThemeToggle`** — `size-11` circle above the rail, icon always `text-accent`, sun/moon swap, `next-themes` (`attribute="class"`, `defaultTheme="dark"`, `disableTransitionOnChange`), neutral icon until `mounted`.
+- **`ScrollToTopButton`** — `size-11` circle below the rail, `arrow-up`, hidden (`opacity-0` + `pointer-events-none`) while `activeSection === "hero"`, fades and lifts in otherwise.
+- **Active state** — subscribes to the existing `useSectionObserver()`. **No second `IntersectionObserver`**, and **no hash sync on scroll** — the hash changes only on click.
+- **Smooth scroll** — GSAP `ScrollToPlugin`, `duration: 0.8`, `power2.inOut`, `autoKill: true`; `preventDefault()` then set `window.location.hash` after the tween completes. `duration: 0` under `prefers-reduced-motion`.
+- **Motion** — mount reveal (wrapper `opacity 0, x 16`, `0.5s` at `1.1s`; links `opacity 0, x 8`, stagger `0.04`, `0.3s` at `1.2s`, `power3.out`) sequenced after the hero load sequence. Indicator tweens `y` on section change (`0.35`, `power3.out`). All inside `useGSAP` with `scope` and `gsap.matchMedia()`.
+- **Layout collision** — content column in `SplitLayout` gets `md:pr-20 lg:pr-24`; verify against the longest headline.
+- **Accessibility** — `<nav aria-label="Section navigation">`, keyboard operable, `focus-visible` accent outline on every control, icons `aria-hidden`, hit targets ≥ `40×40`.
+- **Height guard** — rail capped at `max-h-[70svh] overflow-y-auto` with the scrollbar hidden, never smaller hit targets.
+- Renders `null` below `md`.
 
 ## Notes
 
-<!-- Populated by /feature load -->
+**Spec paths are wrong for this repo.** The spec writes `src/lib/…`, `src/components/…`, `src/app/globals.css`. Per @context/coding-standards.md there is **no `src/` directory** — everything sits at the repo root (`lib/`, `components/`, `app/`). Translate every path; do not create `src/`.
+
+**Open conflict — the theme toggle.** @context/project-overview.md and @context/coding-standards.md both state dark only, no toggle, no `dark:` variants. The spec adds one and acknowledges the cost: a full second palette, plus an accent that fails WCAG AA on white (`#00E5C7` needs a darker variant, ~`#00A88F`). The spec is explicit that a toggle which does nothing is not acceptable — it's ship light mode or remove the button. **This needs a decision before implementation starts**, since it also decides whether `next-themes` gets installed (not currently a dependency).
+
+**Only two of the eight sections exist.** `#hero` ([HeroSection.tsx:160](components/sections/HeroSection.tsx#L160)) and `#work` ([FeaturedWorkShell.tsx:50](components/work/FeaturedWorkShell.tsx#L50)). The other six (`timeline`, `teaching`, `skills`, `more-work`, `beekeeping`, `contact`) ship in later Phase 3 features. Per the spec their links still render and still scroll; they simply never become active. Anchors to non-existent ids will no-op on click — acceptable for now, but worth confirming that's the intended interim behaviour rather than hiding unbuilt entries.
+
+**`ScrollToPlugin` is not yet registered anywhere.** gsap 3.15 is installed and ships the plugin; it just needs `gsap.registerPlugin(useGSAP, ScrollToPlugin)` in the client component.
+
+**Reduced motion.** Existing sections take the stronger line — under `reduce` nothing animates at all rather than animating to final states. Match that: no mount reveal, indicator snaps, scroll is instant.
+
+**Out of scope:** the mobile hamburger nav (Phase 2), the light palette tokens themselves, and section registration for unbuilt sections.
 
 ## History
 
