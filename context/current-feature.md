@@ -1,40 +1,16 @@
-# Current Feature: Mobile Navigation (Phase 2 — Mobile)
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Extract the shared pieces before building: add a `size` prop (`"md"` | `"lg"`) to the existing `ThemeToggle` and `ScrollToTopButton`, and lift the Phase 1 click handler into `lib/use-smooth-scroll.ts` (ScrollToPlugin tween, `autoKill: true`, reduced-motion branch) so both nav layers call one scroll implementation
-- Build `MobileNav` (client orchestrator) mounted in `SplitLayout` alongside `NavigationPill`, outside the grid columns, rendering nothing at `md` and above
-- **Top bar** — `fixed top-0 inset-x-0 z-40 md:hidden`, `h-16`, `px-4`; `RS` monogram linking to `#hero` on the left, hamburger trigger on the right; transparent at scroll 0, fading to `bg-base/80 backdrop-blur-md border-b border-border` past `32px` via a class toggle with a `200ms` CSS transition
-- **Hamburger trigger** — `size-11` circular button, two `18px` / `1.5px` bars `6px` apart, morphing to an X with GSAP (`0.25s`, `power2.inOut`, no SVG swap); `aria-label` Open/Close menu, `aria-expanded`, `aria-controls="mobile-menu"`
-- **Control stack** — `fixed right-4 bottom-4 z-40 md:hidden`, theme toggle above scroll-to-top matching desktop order; both `size-11` circular; scroll-to-top hidden and unfocusable while `activeSection === "hero"`; whole stack hidden while the menu is open
-- **Menu panel** — backdrop `fixed inset-0 z-50 bg-base/70 backdrop-blur-md` (click closes); compact dropdown anchored `top-16 right-4`, `w-[min(15rem,calc(100vw-2rem))]`, `rounded-2xl`, `origin-top-right` — not a full-screen takeover
-- Panel items render `NAV_ITEMS` as real `<a href="#{id}">` rows: icon `size-[18px]` + `text-sm` label, muted default, `text-fg bg-surface-raised` on hover/press, active as `text-accent bg-accent/8` plus a `2px` left accent bar and `aria-current="true"`
-- Open/close behaviour: hamburger toggles, backdrop click closes, `Escape` closes and returns focus to the trigger, item click closes then scrolls (~200ms later), crossing to `md+` closes immediately and unlocks scroll
-- Body scroll lock while open — `overflow: hidden`, scrollbar-width compensation, preserve and restore `scrollY` on close (iOS Safari is the failure case)
-- Focus management — move focus to the first nav item on open, hand-rolled focus trap wrapping between the last item and the close control, return focus to the trigger on close; `role="dialog"`, `aria-modal="true"`, `aria-label="Site navigation"`, `id="mobile-menu"`
-- GSAP open timeline: backdrop `opacity 0→1` (`0.25`, pos `0`), panel `opacity/scale 0.94→1/y -8→0` (`0.3`, pos `0.05`, `back.out(1.4)`), items `opacity/x 8→0` with `0.035` stagger (`0.25`, pos `0.12`); everything else `power3.out`. Close reverses at `0.6×` duration, no stagger, `power2.in`
-- Reduced motion via `gsap.matchMedia()`: panel and backdrop cut in/out at final opacity, no scale or stagger, hamburger swaps without rotating, scroll is instant
-- Hide the `SidebarCard` monogram below `md` (`max-md:hidden`) so it does not stack with the top bar's
-- `44×44` minimum hit targets, `focus-visible` accent outline on every control, icons `aria-hidden`, `svh` units throughout; panel gets `max-h-[calc(100svh-6rem)] overflow-y-auto` in short landscape
+<!-- Populated by /feature load -->
 
 ## Notes
 
-**Spec:** @context/features/mobile-nav-spec.md
-**References:** `context/screenshots/mobile-pill.png`, `mobile-hero.png`, `hamburger-modal.png` (all present)
-
-- **Path discrepancy — the spec is written against `src/`.** @context/coding-standards.md is explicit that there is no `src/` directory: components live at `components/`, utilities at `lib/`. Every `src/…` path in the spec maps one level up (`components/navigation/MobileNav.tsx`, `lib/use-smooth-scroll.ts`). The spec's cross-references also drop the `features/` segment (`@context/navigation-pill-spec.md` is really `@context/features/navigation-pill-spec.md`, `@context/portfolio-project-spec.md` is `@context/project-overview.md`).
-- **Half the "Refactor First" work is already done.** `components/navigation/ThemeToggle.tsx` and `ScrollToTopButton.tsx` are already standalone files from Phase 1 — they need the `size` prop, nothing more. Only the smooth-scroll hook is a genuine extraction, currently inline in `NavigationPill.tsx`.
-- Both extracted buttons carry a desktop-only left-side hover tooltip. On mobile that tooltip has no hover to trigger it and would sit off the right edge — decide during implementation whether `size="lg"` also suppresses it.
-- `NAV_ITEMS` in `lib/navigation.ts` is consumed unchanged. The two nav layers are two presentations of one list; a copy would be the bug.
-- **Six of the eight targets still do not exist** (`timeline`, `teaching`, `skills`, `more-work`, `beekeeping`, `contact`). Menu rows for them will render and no-op, same as the desktop pill today.
-- **The theme toggle is still a placeholder** — `lib/theme.tsx` holds state nothing reads, and @context/project-overview.md plus @context/coding-standards.md both still say dark only, no toggle. This feature puts that unused control on a second surface. The light palette is explicitly out of scope here, so the contradiction carries forward unresolved.
-- Phase 1 left the desktop rail as `hidden md:flex` rather than unmounted, so its eight anchors ship in the mobile DOM. Mounting `MobileNav` alongside it means deciding whether the mobile layer is truly `null` above `md` or the same class-based hide — otherwise the page carries three copies of the nav list.
-- Out of scope: the light theme palette, section registration (each section spec registers its own id), and all gesture handling (no swipe-to-open, no edge gestures — they conflict with browser back-navigation).
-- Reminder from @context/ai-interaction.md: branch before implementing, no commits without permission, no push.
+<!-- Populated by /feature load -->
 
 ## History
 
@@ -189,3 +165,43 @@ A fixed right-edge rail of eight section links, plus scroll-to-top and a placeho
 - **The theme toggle still does nothing.** Either the light palette ships or the button goes; a placeholder control in the corner of every viewport is the least defensible of the three states
 - **The hero stat row renders `1.6 years of experience`**, which @context/project-overview.md rules out by name as "the one number that works against me". CMS content, one Studio edit
 - Six of the eight links (`timeline`, `teaching`, `skills`, `more-work`, `beekeeping`, `contact`) point at sections that do not exist yet and no-op on click
+
+### Mobile Navigation (Phase 2 — Mobile)
+
+**Spec:** @context/features/mobile-nav-spec.md · **Merged:** 2026-08-28 · **Commit:** `7d69ee9`
+
+The navigation layer below `md`, replacing the Phase 1 pill. **The first feature in this project verified in a real browser** — the Playwright MCP tools were finally exposed to the session.
+
+- **`lib/use-smooth-scroll.ts`** — the Phase 1 click handler extracted so both nav layers share one `ScrollToPlugin` implementation. Also exports `prefersReducedMotion()`
+- **`components/navigation/control-size.ts`** — `CONTROL_SIZES` behind a `ControlSize` union; `ThemeToggle` additionally takes `showTooltip`, since a hover tooltip has no trigger on touch and would sit off the right edge
+- **`MobileTopBar`** — `RS` monogram (from `heroSection.monogram`, threaded through `SplitLayout`) plus a hamburger whose bars are positioned with `top`/`bottom` rather than Tailwind translate utilities, so GSAP owns `transform` outright. Background fades in past `32px` through a class toggle, not a `ScrollTrigger`
+- **`MobileMenuPanel`** — compact `top-16 right-4` dropdown over a blurred backdrop; `NAV_ITEMS` as real anchors with icon, label, a `2px` accent bar and `aria-current`
+- **`MobileControlStack`** — both controls share one 44px corner slot. The theme toggle rests in it and lifts `52px` on `elastic.out(1, 0.55)` when the arrow appears, dropping back on `back.in(1.7)`
+- **`MobileNav`** — a `closed | open | closing` machine, body scroll lock with `scrollY` restore, hand-rolled focus trap, `Escape`, and auto-close at `md+`
+
+**Decisions taken during the build:**
+
+- **The panel mounts only while open.** This is what kept the mobile menu's eight anchors from duplicating the pill's eight in the DOM — the concern flagged when the spec was loaded. Confirmed at both breakpoints: 8 pill anchors and 0 menu anchors at rest
+- **`closing` is a third state, not a boolean.** `isOpen` alone would rip the panel out of the DOM mid-exit; the close timeline's `onComplete` is what commits `closed`
+- **`prefersReducedMotion()` instead of the spec's `gsap.matchMedia()`.** A matchMedia context auto-reverts on teardown, which snapped the hamburger back to bars before the close animation could play it. This also matches what `ScrollToTopButton` already did
+- **The scroll lock uses `position: fixed`, not `overflow` alone** — iOS Safari scrolls the body regardless of overflow, which is why `scrollY` has to be restored by hand. The lock effect is declared _before_ the pending-scroll effect so React's cleanup ordering unlocks the body before the tween starts
+- **The top bar goes `z-60` while open** so the trigger sits above the `z-50` backdrop. Required for the focus trap to include it, and it matches `hamburger-modal.png`
+- **Three hamburger bars, not the spec's two** — corrected during review
+- **The `size` prop is half-dead.** The spec asks for `"md" | "lg"` then puts `size-11` on both surfaces, so both call sites pass `lg`. Shrinking the desktop buttons to `size-10` would have dropped them under the 44px hit target, so the `md` branch was left unused rather than forced
+- **The arrow's scale rides on a wrapper div**, not the button — `ScrollToTopButton` runs its own opacity tween and is shared with the desktop pill, so animating a wrapper composes with it and leaves desktop untouched
+
+**Verified in Chrome** at 390×844 unless noted: top-bar background past 32px · open/X morph/stagger · `Escape` closes, unlocks, returns focus, `aria-expanded=false` · backdrop click · item click closes then scrolls (landed at `#hero`, hash written) · body `fixed` → `static` with `scrollY` restored · focus trap wrapping trigger ↔ `#contact` · crossing to `md+` closes and unlocks · panel caps at 324px and scrolls at 640×420 · reduced motion cuts in at opacity 1 and the zero-duration close still fires `onComplete` · `md`/`lg` byte-identical after the `max-md:` changes.
+
+**Gotchas recorded for later features:**
+
+- **`useGSAP` does not revert on dependency change** — `revertOnUpdate` defaults to `false`, only unmount reverts. This is what lets a state-driven timeline animate _from_ where the previous one left off, and why `gsap.matchMedia()` is the wrong tool inside a `useGSAP` keyed on state
+- **`react-hooks/set-state-in-effect` rejects reacting to a derived media-query boolean.** Subscribing to `matchMedia().addEventListener('change', …)` and setting state in the callback is both lint-clean and more correct — only the _crossing_ matters
+- The desktop pill and the mobile stack share `aria-label`s (`Toggle theme`, `Back to top`). A bare `document.querySelector` in a browser check hits the pill's copy first and returns a zero-size rect while it is `display: none` — scope such queries to the mobile container
+- Confirming the Phase 1 note: GSAP's rAF ticker stalls under automation until the mouse moves, so entrance tweens read as "content missing" and mid-flight assertions read as failures. Move the mouse, then measure
+
+**Left for follow-up:**
+
+- **`activeSection` is `null` at the top of the page on mobile**, so the menu shows no active item on the first screen — the sidebar card occupies the observer's middle band before `#hero` does. The desktop pill has the same gap. Section registration is out of scope per the spec, but this is the first place it visibly costs something
+- **The theme toggle still does nothing, and now does nothing on two surfaces.** Third feature running with @context/project-overview.md and @context/coding-standards.md saying dark only, no toggle, while the code ships one
+- **Beyond the spec, at request:** the sidebar card lost its monogram below `md`, gained `pt-20` clearance, dropped to `min-h-[calc(100svh-13rem)]`, and its column took `max-md:min-h-svh` so the hero stops bleeding into the first viewport. The decorative `tabIndex={-1}` arrow CTA is hidden below `sm` to stop the CTA row wrapping
+- Six of the eight menu rows still point at sections that do not exist
