@@ -1,39 +1,16 @@
-# Current Feature: Comment Cleanup + Current Focus Card
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- **Strip over-explicit commenting** from the components. Every file under `components/`, plus `lib/`, `types/` and `content/`, is carrying block comments that narrate what the code already says. Keep only the comments that record a non-obvious decision or a gotcha someone would otherwise reintroduce; delete the rest.
-- **Give the hero's Current Focus panel an outer shadow** so it lifts off the page background the way the reference screenshot shows.
-- **Change the Current Focus tags** to `Next.js`, `TypeScript`, `AI`.
+<!-- Populated by /feature load -->
 
 ## Notes
 
-**Scope of the comment pass.** Current comment-line counts, worst first:
-
-| File                                                 | Comment lines / total |
-| ---------------------------------------------------- | --------------------- |
-| `components/work/FeaturedProjectCard.tsx`            | 31 / 274              |
-| `lib/section-observer.tsx`                           | 24 / 160              |
-| `components/layout/CardReadout.tsx`                  | 21 / 103              |
-| `types/work.ts`                                      | 16 / 63               |
-| `components/layout/readouts/FeaturedWorkReadout.tsx` | 14 / 44               |
-| `content/work.ts`                                    | 14 / 29               |
-| `components/sections/FeaturedWorkSection.tsx`        | 12 / 39               |
-| `components/layout/SplitLayout.tsx`                  | 12 / 33               |
-
-The keep/cut test: a comment survives if deleting it would let someone silently break something. The three worth keeping across the codebase are already known — the Tailwind `scale-*` / GSAP `yPercent` interaction in `FeaturedProjectCard`, the "only push on enter, never clear on exit" rule in `FeaturedWorkShell`, and the `isDesktop` dependency in `CardReadout`. Everything that restates a prop name, re-describes a class list, or explains what `useGSAP` does goes.
-
-**The tags are CMS data, not code.** They live at `heroSection.currentFocus.tags` in Sanity, currently `["TypeScript", "Product thinking"]`. Changing them to `Next.js · TypeScript · AI` is a Studio edit (or an MCP patch), not an edit to `HeroSection.tsx`.
-
-**The label does not match the screenshot.** The reference reads `CURRENT FOCUS`; the published document says `CURRENT ROLE`, and the statement is `AI Native Software Engineering · Booksy` rather than `Shipping calmer interfaces.` The screenshot is a styling reference — confirm before changing copy, since the current copy is the Booksy positioning the page argues for.
-
-**The shadow has a design-system constraint.** @context/project-overview.md rules out colored drop shadows and glassmorphism, so this is a neutral, near-black shadow that reads as depth — not an accent glow around the left rail. The panel already carries `border-l-2 border-l-accent` and `rounded-r-card`; the shadow needs to sit under that without turning into the neon treatment the whole redesign exists to get away from.
-
-**Where the markup lives:** the panel is the `data-hero="focus"` block in `components/sections/HeroSection.tsx`, around line 200. It is one of the elements the hero's GSAP load timeline animates, so any wrapper change has to keep that `data-hero` hook intact.
+<!-- Populated by /feature load -->
 
 ## History
 
@@ -129,3 +106,32 @@ Section B, plus the interaction the split layout exists for.
 - **`→ case study` links 404.** `/work/[slug]` ships in Phase 4; expected, per the spec's Out of Scope
 - **No browser verification.** Playwright MCP tools were again not exposed to the session, so this is SSR HTML plus generated-CSS inspection only. **The readout crossfade is unverified in a browser** — and @context/project-overview.md calls it the highest-risk component, the one to confirm feels useful rather than gimmicky before more sections are built on the premise
 - **`firstSentence` and `hostnameOf`** in `FeaturedProjectCard.tsx` are the first real data-shaping functions in the codebase. Per @context/coding-standards.md that is the trigger for installing Vitest; they were left in the component rather than promoted to `lib/` to keep the commit scoped
+
+### Comment Cleanup + Current Focus Card
+
+**Spec:** inline (`/feature load`) · **Merged:** 2026-08-28 · **Commit:** `a5377fc`
+
+A maintenance pass over comment density, plus two small changes to the hero's focus panel.
+
+- **Comments** — 208 comment lines down to 41 across 18 files in `components/`, `lib/`, `types/`, `content/` and `app/`. Every docblock that restated a prop name, re-described a class list or explained what `useGSAP` does was cut. What survives is one or two lines each.
+- **Offset accent block** — `--shadow-offset-accent: 10px 10px 0 0 rgb(0 229 199 / 0.1)` in the `@theme` block, applied to the `data-hero="focus"` panel.
+- **Tags** — `heroSection.currentFocus.tags` patched and published to `["Next.js", "TypeScript", "AI"]`. No code change; the tags were already CMS data.
+
+**Decisions taken during the build:**
+
+- **The kept comments are a fixed list.** The keep test was "does deleting this let someone silently break something". Survivors: the `scale-[1.08]` parallax travel room and the push-on-enter observer rule in `FeaturedProjectCard`, the `isDesktop` GSAP dependency in `CardReadout`, the `portrait?.asset` guard and the clipped status capsule in `SidebarCard`, the `min-h-18` reflow lock in `FeaturedWorkReadout`, the document-order tie-break in `section-observer`, the schema-duplication rationale in `content/work.ts`, and the hydration-timing note in `use-media-query`
+- **`box-shadow`, not an offset `::before`.** A pseudo-element would need `z-index: -1`, and the hero's `page-grid` and `hero-glow` layers are positioned siblings that paint in the z-auto layer — above negative-z-index content. A zero-blur `box-shadow` paints behind the element's own background with no stacking-context exposure, and inherits `rounded-r-card` for free
+- **First attempt was wrong.** A blurred three-layer neutral elevation shadow was built first from the screenshot, then replaced — the reference was a flat offset rectangle, not depth
+- **`app/globals.css` comments were left alone.** The request named components; the stylesheet's comments document token and utility intent
+- **The `next-sanity` docblock in `app/studio/[[...tool]]/page.tsx` was cut** — eight lines of upstream boilerplate linking to docs. It will come back if the route is ever regenerated
+
+**Gotchas recorded for later features:**
+
+- `npm install` copies indentation from `package.json` into `package-lock.json`. The lockfile was tab-indented from before Prettier landed, so an install rewrote all 19.5k lines. `npm install --package-lock-only` after formatting `package.json` re-derives it and shrinks the diff to the real change
+- A Tailwind v4 `@theme` typo produces no class and no error — the utility silently does not exist. Verify new tokens against `.next/static/chunks/*.css` from a production build
+
+**Left for follow-up:**
+
+- **No browser verification.** Playwright MCP tools were not exposed to this session either. The offset block is confirmed in the production CSS (`.shadow-offset-accent{--tw-shadow:10px 10px 0 0 …}`) and in the prerendered HTML, but has not been looked at
+- **The offset block is a coloured shadow**, which @context/project-overview.md rules out. It is a flat graphic device rather than a glow, and it was explicitly requested — but the rule and the code now disagree, and one of them should move
+- **The focus panel's label and statement still read `CURRENT ROLE` / `AI Native Software Engineering · Booksy`**, not the screenshot's `CURRENT FOCUS` / `Shipping calmer interfaces.` Treated as a styling reference; the copy was left as the Booksy positioning
