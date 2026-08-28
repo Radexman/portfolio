@@ -10,15 +10,7 @@ import type { FeaturedWorkSectionCopy } from '@/types/work'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
-/**
- * The client half of the Featured work section: the `<section>` element, its
- * registration with the shared section observer, and the header reveal.
- *
- * It exists so `FeaturedWorkSection` can stay a server component and do the
- * fetching — the two things that need the browser (an observer ref and GSAP)
- * are the only things that live here. The cards are passed through as children
- * and mount as their own client components.
- */
+// Exists so FeaturedWorkSection can stay a server component and do the fetching.
 export function FeaturedWorkShell({
   copy,
   children,
@@ -32,8 +24,8 @@ export function FeaturedWorkShell({
     () => {
       const mm = gsap.matchMedia()
 
-      // Elements render in their final state; gsap sets the "from" state before
-      // paint. Under reduced motion this never runs, so nothing is ever hidden.
+      // Elements render in their final state and gsap sets the "from" before
+      // paint, so under reduced motion nothing is ever hidden.
       mm.add('(prefers-reduced-motion: no-preference)', () => {
         gsap.from('[data-work-header] > *', {
           opacity: 0,

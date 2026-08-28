@@ -11,14 +11,8 @@ import {
   type ReactNode,
 } from 'react'
 
-/**
- * Tracks which section occupies the middle band of the viewport so the sidebar
- * card can render a readout for it.
- *
- * One IntersectionObserver is shared by every section — not one per section.
- * `rootMargin` shrinks the root to the middle 20% of the viewport, so "active"
- * means "in the middle of the screen", not "anywhere on screen".
- */
+// Shrinks the root to the middle 20% of the viewport, so "active" means "in the
+// middle of the screen", not "anywhere on screen".
 const ROOT_MARGIN = '-40% 0px -40% 0px'
 
 export type SectionPayload = Record<string, unknown> | null
@@ -26,9 +20,7 @@ export type SectionPayload = Record<string, unknown> | null
 interface SectionObserverValue {
   activeSection: string | null
   activePayload: SectionPayload
-  /** Attach an element to the shared observer. Returns its cleanup. */
   register: (element: Element, id: string) => () => void
-  /** Update a section's payload without re-observing its element. */
   setPayload: (id: string, payload: SectionPayload) => void
 }
 
@@ -43,11 +35,8 @@ export function SectionObserverProvider({ children }: { children: ReactNode }) {
   const payloadsRef = useRef(new Map<string, SectionPayload>())
   const visibleRef = useRef(new Set<Element>())
 
-  /**
-   * With a middle-band root margin two sections can briefly overlap. Resolve
-   * ties by document order so the active section only ever moves forwards or
-   * backwards by one, never jumps.
-   */
+  // Two sections can briefly share the middle band. Ties resolve by document
+  // order so the active section steps by one rather than jumping.
   const resolveActive = useCallback(() => {
     const visible = [...visibleRef.current]
     if (visible.length === 0) return
@@ -97,8 +86,7 @@ export function SectionObserverProvider({ children }: { children: ReactNode }) {
     [getObserver],
   )
 
-  // Lets setPayload read the active section without depending on it, so the
-  // callback identity stays stable across section changes.
+  // Read by setPayload without being a dependency, so its identity stays stable.
   const activeSectionRef = useRef<string | null>(null)
   useEffect(() => {
     activeSectionRef.current = activeSection
@@ -132,13 +120,8 @@ export function useSectionObserverContext() {
   return context
 }
 
-/**
- * Register a section. Returns the ref to spread onto the `<section>`.
- *
- * `payload` is passed through a separate effect so a section can push a new
- * payload (a hovered skill, an entered project) without the element being
- * unobserved and re-observed.
- */
+// `payload` runs through its own effect so pushing a new one never unobserves
+// and re-observes the element.
 export function useSectionObserver<T extends HTMLElement = HTMLElement>(
   id: string,
   payload: SectionPayload = null,

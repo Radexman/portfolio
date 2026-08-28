@@ -1,14 +1,5 @@
 import type { SanityImageSource } from '@sanity/image-url'
 
-/**
- * Hand-written result types for `heroSectionQuery`.
- *
- * TypeGen is not configured (see context/coding-standards.md). If the schema
- * grows enough to justify it, generate these instead of maintaining them.
- * Optional fields mirror the schema: anything without `validation.required()`
- * can come back missing and must be guarded at the render site.
- */
-
 export type SocialPlatform = 'github' | 'linkedin' | 'x' | 'email'
 
 export type StatusTone = 'upcoming' | 'available' | 'none'
@@ -47,7 +38,6 @@ export interface CurrentFocus {
 export interface HeroPortrait {
   alt: string
   asset?: { _ref: string; _type: string }
-  /** Focal point chosen in Studio, 0–1 on both axes. */
   hotspot?: { x: number; y: number }
 }
 

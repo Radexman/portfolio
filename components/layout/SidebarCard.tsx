@@ -30,10 +30,6 @@ type SidebarCardProps = Pick<
   | 'secondaryCta'
 >
 
-/**
- * A stylised mark rather than plain text: the first letter carries full weight,
- * the second drops back, and a hairline rule ties them together.
- */
 function Monogram({ value }: { value: string }) {
   const [first, ...rest] = value
   return (
@@ -60,9 +56,6 @@ export function SidebarCard({
 
   useGSAP(
     () => {
-      // No "from" state in the markup: the card renders in its final state and
-      // gsap sets the start state in a layout effect before first paint. Under
-      // reduced motion this branch never runs, so nothing is ever hidden.
       const mm = gsap.matchMedia()
 
       mm.add('(prefers-reduced-motion: no-preference)', () => {
@@ -79,13 +72,12 @@ export function SidebarCard({
     { scope: cardRef },
   )
 
-  // An image field exists as soon as alt text is typed, with no asset until a
-  // file is uploaded — so check for the asset, not the object.
+  // A Sanity image field exists as soon as alt text is typed, with no asset
+  // until a file is uploaded — check the asset, never the object.
   const portraitUrl = portrait?.asset
     ? urlFor(portrait).width(900).quality(85).auto('format').url()
     : null
 
-  // Respect the focal point chosen in Studio rather than always centring.
   const objectPosition = portrait?.hotspot
     ? `${portrait.hotspot.x * 100}% ${portrait.hotspot.y * 100}%`
     : '50% 50%'
@@ -118,7 +110,6 @@ export function SidebarCard({
           <div aria-hidden="true" className="absolute inset-0 bg-surface-raised" />
         )}
 
-        {/* Scrim so the content block stays readable over any portrait */}
         <div
           aria-hidden="true"
           className="absolute inset-0 bg-gradient-to-t from-base via-base/75 to-transparent"
@@ -146,12 +137,9 @@ export function SidebarCard({
           </ul>
         )}
 
-        {/* Vertical status capsule. It is a full 48px capsule pushed 20px past
-            the left edge, so the parent's overflow-hidden clips its left half
-            and the visible corners become long curves running into the border.
-            The 20px left padding cancels the offset, keeping the label and dot
-            centred in the ~28px that actually shows. The dot pulses; the
-            capsule stays still, so it reads as a status not an alert. */}
+        {/* A full 48px capsule pushed 20px past the left edge: the parent's
+            overflow-hidden clips its left half into long curves, and the 20px
+            left padding re-centres the label in what still shows. */}
         {showBadge && (
           <div className="absolute top-[44%] -left-5 flex w-12 -translate-y-1/2 flex-col items-center gap-3 rounded-full border border-border bg-surface-raised/90 py-4 pl-5">
             <span className="rotate-180 font-sans text-[11px] leading-none font-medium text-fg [writing-mode:vertical-rl]">
@@ -175,12 +163,8 @@ export function SidebarCard({
 
           <p className="mt-2 text-sm leading-relaxed text-fg-muted">{cardBio}</p>
 
-          {/*
-            Readout slot. Empty at hero, so it takes no space — reserving
-            height here pushed the greeting into the middle of the card. Each
-            variant sets its own fixed height, which is what actually prevents
-            the card reflowing when the readout swaps.
-          */}
+          {/* Takes no space when empty — reserving height here pushed the
+              greeting off-centre at the hero. */}
           <CardReadout />
 
           <hr className="my-4 border-border/70" />
