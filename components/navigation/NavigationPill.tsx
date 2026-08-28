@@ -2,22 +2,18 @@
 
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
-import { ScrollToPlugin } from 'gsap/ScrollToPlugin'
-import { useCallback, useRef } from 'react'
+import { useRef } from 'react'
 
 import { NavPillLink } from '@/components/navigation/NavPillLink'
 import { ScrollToTopButton } from '@/components/navigation/ScrollToTopButton'
 import { ThemeToggle } from '@/components/navigation/ThemeToggle'
 import { NAV_ITEMS } from '@/lib/navigation'
 import { useSectionObserverContext } from '@/lib/section-observer'
+import { prefersReducedMotion, useSmoothScroll } from '@/lib/use-smooth-scroll'
 
-gsap.registerPlugin(useGSAP, ScrollToPlugin)
+gsap.registerPlugin(useGSAP)
 
 const INDICATOR_HEIGHT = 16
-
-function prefersReducedMotion() {
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
-}
 
 export function NavigationPill() {
   const { activeSection } = useSectionObserverContext()
@@ -25,20 +21,7 @@ export function NavigationPill() {
   const listRef = useRef<HTMLUListElement>(null)
   const indicatorRef = useRef<HTMLSpanElement>(null)
 
-  const scrollToSection = useCallback((id: string | null) => {
-    const target = id ? document.getElementById(id) : null
-    if (id && !target) return
-
-    gsap.to(window, {
-      scrollTo: { y: target ?? 0, autoKill: true },
-      duration: prefersReducedMotion() ? 0 : 0.8,
-      ease: 'power2.inOut',
-      overwrite: true,
-      onComplete: () => {
-        if (id) window.location.hash = id
-      },
-    })
-  }, [])
+  const scrollToSection = useSmoothScroll()
 
   useGSAP(
     () => {
