@@ -2,18 +2,18 @@
 
 ## Status
 
-Not Started
+In Progress — branch `feature/side-project`
 
 ## Goals
 
 - **Sanity — `sideProjectSection` singleton** with `eyebrow`, `headline`, `framingLine`, `triptych` (array of `triptychImage`, exactly 3), `project` (reference → `project`), and `inspectionSteps` (array of `inspectionStep`, max 5). Registered in `sanity/schemaTypes/index.ts` and pinned in `sanity/structure.ts` the same way `heroSection` and `featuredWorkSection` are.
 - **Two new objects** — `triptychImage` (`image` with hotspot + required `alt`, plus a lowercase one-word `caption`) and `inspectionStep` (`prompt` / `response` / `field`).
-- **Seed and publish** the Hive Log `project` document (`featured: false`, `thesis: "product-thinking"`, company `Personal project`, role `Everything — design, backend, voice flow`, year `2025 — present`, the Python/FastAPI/Whisper/LLM/PDF stack, and the three-field problem/approach/outcome copy from the spec), plus the section copy and inspection steps.
+- **Seed and publish** the Hivewise `project` document (`featured: false`, `thesis: "product-thinking"`, company `Personal project`, role `Everything — design, backend, voice flow`, year `2025 — present`, `visibility: "public"` plus its registration URL, the Python/FastAPI/Whisper/LLM/PDF-microservice stack, and the three-field problem/approach/outcome copy), plus the section copy and inspection steps. **Developer-owned — done in Studio, not from this session.**
 - **`SideProjectSection`** (server) fetches header copy, triptych, the referenced project and the steps in one query added to `sanity/lib/queries.ts`; a client shell owns `<section id="beekeeping">`, `useSectionObserver`, and the reveals — the three-file split already used by Featured work.
 - **`Triptych`** — three `3:4` figures, `next/image` with `fill` + hotspot + explicit `sizes`, hairline borders, lowercase mono captions, hover changes border colour only.
 - **Project block** — title, mono role line, problem then approach (constraint before feature), `StackTags`-equivalent tag row and the same `visibility`-driven link row as `FeaturedProjectCard`.
 - **`VoiceFlow`** — static vertical prompt / response / field list on a `1px` connector, revealing on a deliberately slow `0.12` stagger with the line drawing `scaleY: 0 → 1` alongside. No microphone, no speech API, no audio.
-- **`SideProjectReadout`** added to the `CardReadout` variant map, keyed `beekeeping`, reusing the `FeaturedWorkReadout` layout with `role` / `meta` / `stack` props.
+- **`SideProjectReadout`** added to the `CardReadout` variant map, keyed `beekeeping`, with `role` / `meta` / `stack` props.
 - **Responsive** — `grid-cols-3` at `md+`; below `md` a snap-scrolling `flex` row at `w-[70%]` per figure with a `mask-image` edge fade. Never stacked vertically.
 - **Motion** — four `ScrollTrigger` reveals (`once: true`) inside `gsap.matchMedia()`; under `reduce` nothing animates and the connector renders full height.
 - `npm run lint`, `npx tsc --noEmit` and `npm run build` clean, then a real browser pass at `lg` / `md` / `390px`.
@@ -29,13 +29,35 @@ Not Started
 - **`thesis: "product-thinking"` already exists** in `PROJECT_THESES`, and `beekeeping` / `sprout` already exists in `NAV_ITEMS`. Neither needs adding.
 - **Section order.** The spec calls this the seventh section; C–F (timeline, teaching, skills, more work) are not built, so this ships third and sits directly after Featured work until they land.
 
-**Open questions before implementation:**
+**Decisions taken during the build:**
 
-- **The three triptych photographs do not exist**, and the spec is explicit that the grading must happen in the source files, not in CSS — no `grayscale`/`sepia` shortcut. Without them the section renders three placeholder frames, the same state Featured work is still in. Confirm whether to ship the structure with placeholders or wait on the images.
-- **Hive Log's `visibility`** — the spec says "`public` or `no-public-url`, whichever is true". Needs an answer before seeding; `no-public-url` is the safe default.
-- **The bento exclusion rule is unbuildable yet.** More work does not exist, so its query cannot filter the hive app out. Recorded as a hard requirement for whoever builds section F rather than done here.
+- **`sideProjectSection` is a third sibling singleton**, registered in `sanity/schemaTypes/index.ts`, pinned in `sanity/structure.ts`, and added to `SINGLETON_TYPES` so `sanity.config.ts` strips duplicate/delete/unpublish.
+- **`triptychImage` is `type: 'image'`, not an object wrapping one.** The spec's table lists an `image` sub-field; declaring the array member as an image directly means `urlFor()` takes it as-is, the same shape as `project.coverImage`.
+- **`SideProjectReadout` is its own component**, not `FeaturedWorkReadout` with remapped props. The spec's payload is `role` / `meta` / `stack`, and forcing it through `company` / `year` would have meant seeding `company: 'Hivewise'` — the project title in a field named for the client.
+- **`StackTags` extracted to `components/work/StackTags.tsx`** and adopted by `FeaturedProjectCard` too. `content/project-overview.md` already lists it as a shared component, and the alternative was a second copy of the chip class string.
+- **`firstSentence` / `hostnameOf` promoted to `lib/format.ts`.** The side project block needs `hostnameOf` for the same link row; a second copy is how the two rows drift apart. This is the `lib/` utility the coding standards name as the Vitest trigger — **Vitest still is not installed**, deliberately, to keep this commit scoped.
+- **`SideProjectPayload` is a `type`, not an `interface`.** Only inferred object types get an implicit index signature, so an interface will not satisfy `SectionPayload`'s `Record<string, unknown>`.
+- **`triptych-row` utility** in `globals.css` carries the scrollbar hiding and the edge-fade mask, both dropped at `md` where the row becomes a grid.
 
-**Carried in from the working tree:** `components/layout/SidebarCard.tsx`, `components/navigation/MobileMenuPanel.tsx` and `context/features/mobile-nav-spec.md` are modified and uncommitted (one line each in the two components). These should be resolved before branching so they do not ride along in this feature's commit.
+**Verified in Chrome** against temporary local fixture data (never written to Sanity, file restored afterwards):
+
+- `lg` 1440 — triptych `grid-cols-3` at exactly `0.75` aspect on all three, mask off, eyebrow `rgb(138,143,154)` (muted, not accent), block `p-8`
+- All four reveals fire on their own triggers, `once: true`: figures, captions, block, and the connector drawing `scaleY 0 → 1` to 338px of a 346px list
+- Sidebar readout swaps to `Personal project` / `HIVEWISE · 2025 — PRESENT` / the stack; nav rail `aria-current` tracks `#beekeeping`
+- `md` 768 — stays `grid-cols-3`, mask off, `p-6`, response `16px` / `pl-6`
+- `390` — `flex` + `snap x mandatory`, mask present, figures 229px of a 375px row, `p-5`, response `14px` / `pl-4`, title `20px`, no horizontal page overflow
+- Both link-row branches: `Internal platform — no public URL` and `↗ hostname` with `target="_blank"`
+
+**Open — blocking the seed:**
+
+- **Hivewise's public URL.** Confirmed 2026-09-01: the app is called **Hivewise**, not Hive Log, and it has a public link with registration — so `visibility: "public"`, which the schema validates as requiring a `liveUrl`. The URL itself has not been supplied and must not be invented.
+- **The three triptych photographs do not exist.** Shipping with placeholder frames (`// photo pending`), the same state Featured work is in. The grade must happen in the source files — no `grayscale`/`sepia` in CSS.
+- **Seeding is the developer's, in Studio.** Sanity MCP is unauthorized in this session and no write token is available; nothing was written to the dataset.
+
+**Carried forward, not done here:**
+
+- **The bento exclusion rule is unbuildable yet.** More work does not exist, so its query cannot filter Hivewise out. A hard requirement for whoever builds section F.
+- **`text-base` is dead weight in two existing files.** Confirmed against the production CSS: `.text-base{color:var(--color-base)}` — a colour, not a size. `FeaturedWorkShell.tsx:57` and `FeaturedProjectCard.tsx` both write `text-base text-fg-muted`; `.text-fg-muted` is emitted later so it currently wins and the render is correct by accident of source order. New code in this feature avoids `text-base` entirely.
 
 ## History
 

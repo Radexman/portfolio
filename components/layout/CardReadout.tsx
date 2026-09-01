@@ -8,6 +8,10 @@ import {
   FeaturedWorkReadout,
   isFeaturedWorkPayload,
 } from '@/components/layout/readouts/FeaturedWorkReadout'
+import {
+  isSideProjectPayload,
+  SideProjectReadout,
+} from '@/components/layout/readouts/SideProjectReadout'
 import { useSectionObserverContext, type SectionPayload } from '@/lib/section-observer'
 import { useMediaQuery } from '@/lib/use-media-query'
 
@@ -18,6 +22,8 @@ gsap.registerPlugin(useGSAP)
 const READOUT_VARIANTS: Record<string, (payload: SectionPayload) => ReactNode | null> = {
   work: (payload) =>
     isFeaturedWorkPayload(payload) ? <FeaturedWorkReadout payload={payload} /> : null,
+  beekeeping: (payload) =>
+    isSideProjectPayload(payload) ? <SideProjectReadout payload={payload} /> : null,
 }
 
 export function CardReadout() {

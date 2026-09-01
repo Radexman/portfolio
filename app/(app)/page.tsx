@@ -4,6 +4,7 @@ import { SidebarCard } from '@/components/layout/SidebarCard'
 import { SplitLayout } from '@/components/layout/SplitLayout'
 import { FeaturedWorkSection } from '@/components/sections/FeaturedWorkSection'
 import { HeroSection } from '@/components/sections/HeroSection'
+import { SideProjectSection } from '@/components/sections/SideProjectSection'
 import { sanityFetch } from '@/sanity/lib/live'
 import { heroSectionQuery } from '@/sanity/lib/queries'
 import type { HeroSection as HeroSectionData } from '@/types/hero'
@@ -54,6 +55,8 @@ export default async function HomePage() {
     >
       <HeroSection hero={hero} />
       <FeaturedWorkSection />
+      {/* Sits directly after Featured work until sections C–F land. */}
+      <SideProjectSection />
     </SplitLayout>
   )
 }

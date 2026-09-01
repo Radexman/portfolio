@@ -5,7 +5,7 @@ import type { StructureResolver } from 'sanity/structure'
  * Listed here so they can be filtered out of the generated list below and
  * rendered as a direct editor instead of a document list.
  */
-export const SINGLETON_TYPES = ['heroSection', 'featuredWorkSection'] as const
+export const SINGLETON_TYPES = ['heroSection', 'featuredWorkSection', 'sideProjectSection'] as const
 
 /**
  * Types that already have a hand-built entry below. They are filtered out of
@@ -41,6 +41,16 @@ export const structure: StructureResolver = (S) => {
             .id('featuredWorkSection')
             .schemaType('featuredWorkSection')
             .documentId('featuredWorkSection'),
+        ),
+      S.listItem()
+        .id('sideProjectSection')
+        .schemaType('sideProjectSection')
+        .title('Side project section')
+        .child(
+          S.editor()
+            .id('sideProjectSection')
+            .schemaType('sideProjectSection')
+            .documentId('sideProjectSection'),
         ),
       S.divider(),
       // Featured is a filtered view of the same documents, not a separate type:

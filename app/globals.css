@@ -217,3 +217,19 @@
 @utility marquee-mask {
   mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
 }
+
+/* The triptych's mobile scroll row. The edge fade is what signals "scrollable"
+   once the scrollbar is hidden; above md the row becomes a grid with nothing to
+   scroll, so both come off. */
+@utility triptych-row {
+  scrollbar-width: none;
+  mask-image: linear-gradient(to right, transparent, black 6%, black 88%, transparent);
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (width >= 48rem) {
+    mask-image: none;
+  }
+}
