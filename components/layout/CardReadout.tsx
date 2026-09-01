@@ -5,10 +5,6 @@ import gsap from 'gsap'
 import { useRef, useState, type ReactNode } from 'react'
 
 import {
-  FeaturedWorkReadout,
-  isFeaturedWorkPayload,
-} from '@/components/layout/readouts/FeaturedWorkReadout'
-import {
   isSideProjectPayload,
   SideProjectReadout,
 } from '@/components/layout/readouts/SideProjectReadout'
@@ -19,9 +15,9 @@ gsap.registerPlugin(useGSAP)
 
 // Each variant carries its own fixed height. The slot must not reserve any, or
 // the card's greeting is pushed off-centre at the hero.
+// `work` is deliberately absent: Selected work replaces the whole card via
+// `ProjectMode` rather than filling this slot.
 const READOUT_VARIANTS: Record<string, (payload: SectionPayload) => ReactNode | null> = {
-  work: (payload) =>
-    isFeaturedWorkPayload(payload) ? <FeaturedWorkReadout payload={payload} /> : null,
   beekeeping: (payload) =>
     isSideProjectPayload(payload) ? <SideProjectReadout payload={payload} /> : null,
 }

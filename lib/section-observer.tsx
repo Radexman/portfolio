@@ -34,6 +34,7 @@ export function SectionObserverProvider({ children }: { children: ReactNode }) {
   const idsRef = useRef(new Map<Element, string>())
   const payloadsRef = useRef(new Map<string, SectionPayload>())
   const visibleRef = useRef(new Set<Element>())
+  const activeSectionRef = useRef<string | null>(null)
 
   // Two sections can briefly share the middle band. Ties resolve by document
   // order so the active section steps by one rather than jumping.
@@ -49,6 +50,12 @@ export function SectionObserverProvider({ children }: { children: ReactNode }) {
 
     const id = idsRef.current.get(first)
     if (!id) return
+
+    // Written here rather than in an effect: `setPayload` reads it in the same
+    // batch, and a section observer and a card observer routinely fire together
+    // on a long jump. A ref that lagged a render would drop the payload pushed
+    // alongside the section change and leave the previous one on screen.
+    activeSectionRef.current = id
 
     setActiveSection(id)
     setActivePayload(payloadsRef.current.get(id) ?? null)
@@ -85,12 +92,6 @@ export function SectionObserverProvider({ children }: { children: ReactNode }) {
     },
     [getObserver],
   )
-
-  // Read by setPayload without being a dependency, so its identity stays stable.
-  const activeSectionRef = useRef<string | null>(null)
-  useEffect(() => {
-    activeSectionRef.current = activeSection
-  }, [activeSection])
 
   const setPayload = useCallback((id: string, payload: SectionPayload) => {
     payloadsRef.current.set(id, payload)

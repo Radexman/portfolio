@@ -2,57 +2,60 @@
 
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
-import Image from 'next/image'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 
-import { CardReadout } from '@/components/layout/CardReadout'
-import {
-  ArrowUpRightIcon,
-  DocumentIcon,
-  SOCIAL_ORDER,
-  SocialIcon,
-  socialLabel,
-} from '@/components/ui/SocialIcon'
-import { urlFor } from '@/sanity/lib/image'
-import type { HeroSection } from '@/types/hero'
+import { IdentityMode, type IdentityModeProps } from '@/components/layout/card-modes/IdentityMode'
+import { isProjectCardPayload, ProjectMode } from '@/components/layout/card-modes/ProjectMode'
+import { useSectionObserverContext } from '@/lib/section-observer'
+import { useMediaQuery } from '@/lib/use-media-query'
+import { prefersReducedMotion } from '@/lib/use-smooth-scroll'
+import type { ProjectCardPayload } from '@/types/work'
 
 gsap.registerPlugin(useGSAP)
 
-type SidebarCardProps = Pick<
-  HeroSection,
-  | 'portrait'
-  | 'monogram'
-  | 'cardGreeting'
-  | 'cardBio'
-  | 'statusBadge'
-  | 'socials'
-  | 'primaryCta'
-  | 'secondaryCta'
->
+const WORK_SECTION_ID = 'work'
+const SWAP_DURATION = 0.2
+const MODE_DURATION = 0.25
 
-function Monogram({ value }: { value: string }) {
-  const [first, ...rest] = value
-  return (
-    <span className="inline-flex items-center gap-1.5" aria-hidden="true">
-      <span className="font-display text-[19px] leading-none font-bold tracking-[-0.06em] text-fg">
-        {first}
-        <span className="text-fg/35">{rest.join('')}</span>
-      </span>
-    </span>
-  )
+type CardMode = 'identity' | 'project'
+
+interface RenderedState {
+  mode: CardMode
+  payload: ProjectCardPayload | null
 }
 
-export function SidebarCard({
-  portrait,
-  monogram,
-  cardGreeting,
-  cardBio,
-  statusBadge,
-  socials,
-  primaryCta,
-  secondaryCta,
-}: SidebarCardProps) {
+// One string per distinct card state, so an unchanged payload never re-triggers
+// the fade.
+function stateKey({ mode, payload }: RenderedState) {
+  return mode === 'project' && payload ? `project:${payload.index}` : 'identity'
+}
+
+export function SidebarCard(props: IdentityModeProps) {
   const cardRef = useRef<HTMLElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
+  const timelineRef = useRef<gsap.core.Timeline | null>(null)
+  const entranceRef = useRef<gsap.core.Timeline | null>(null)
+  const hasSwappedRef = useRef(false)
+
+  const { activeSection, activePayload } = useSectionObserverContext()
+
+  // Project mode is a desktop idea: below lg the card is not sticky, it scrolls
+  // away with the hero, and it stays the identity card. Gated here rather than
+  // relying on the observers not registering — a payload pushed at desktop
+  // width survives a resize down, and would otherwise follow the card into a
+  // breakpoint the whole interaction was never meant for.
+  const isDesktop = useMediaQuery('(min-width: 64rem)')
+
+  const projectPayload =
+    isDesktop && activeSection === WORK_SECTION_ID && isProjectCardPayload(activePayload)
+      ? activePayload
+      : null
+
+  const next: RenderedState = projectPayload
+    ? { mode: 'project', payload: projectPayload }
+    : { mode: 'identity', payload: null }
+
+  const [rendered, setRendered] = useState<RenderedState>({ mode: 'identity', payload: null })
 
   useGSAP(
     () => {
@@ -72,23 +75,79 @@ export function SidebarCard({
     { scope: cardRef },
   )
 
-  // A Sanity image field exists as soon as alt text is typed, with no asset
-  // until a file is uploaded — check the asset, never the object.
-  const portraitUrl = portrait?.asset
-    ? urlFor(portrait).width(900).quality(85).auto('format').url()
-    : null
+  // Phase 1 — fade the outgoing card out, then commit the swap at the empty
+  // point. Keeping this on the wrapper is what gives the reference's blank
+  // frame between two projects instead of a crossfade.
+  useGSAP(
+    () => {
+      const element = contentRef.current
+      if (!element || stateKey(next) === stateKey(rendered)) return
 
-  const objectPosition = portrait?.hotspot
-    ? `${portrait.hotspot.x * 100}% ${portrait.hotspot.y * 100}%`
-    : '50% 50%'
+      // Rapid scrolling can cross all three cards inside one transition. Killing
+      // the in-flight timeline is what stops the card lagging projects behind.
+      timelineRef.current?.kill()
 
-  const orderedSocials = socials
-    ? [...socials].sort(
-        (a, b) => SOCIAL_ORDER.indexOf(a.platform) - SOCIAL_ORDER.indexOf(b.platform),
-      )
-    : []
+      const commit = () => setRendered(next)
 
-  const showBadge = statusBadge && statusBadge.tone !== 'none'
+      // `prefersReducedMotion()` rather than `gsap.matchMedia()`: a matchMedia
+      // context reverts on teardown, which would snap the outgoing content back
+      // to full opacity for a frame every time the swap is interrupted.
+      if (prefersReducedMotion()) {
+        gsap.set(element, { opacity: 1 })
+        commit()
+        return
+      }
+
+      // A mode change swaps a portrait for a project wash — too different to
+      // read as anything but a glitch at the between-projects speed.
+      const duration = next.mode === rendered.mode ? SWAP_DURATION : MODE_DURATION
+
+      timelineRef.current = gsap
+        .timeline()
+        .to(element, { opacity: 0, duration, ease: 'power2.in' })
+        .call(commit)
+    },
+    { scope: cardRef, dependencies: [next.mode, next.payload?.index, isDesktop] },
+  )
+
+  // Phase 2 — the entrance, keyed on what is actually rendered. It has to be a
+  // separate pass: the incoming elements do not exist until React commits, so a
+  // selector added to the outgoing timeline would resolve to the old DOM.
+  useGSAP(
+    () => {
+      const element = contentRef.current
+      if (!element) return
+
+      // The card has its own mount tween; the first render is not a swap.
+      if (!hasSwappedRef.current) {
+        hasSwappedRef.current = true
+        return
+      }
+
+      if (prefersReducedMotion()) {
+        gsap.set(element, { opacity: 1 })
+        return
+      }
+
+      entranceRef.current?.kill()
+      entranceRef.current = gsap
+        .timeline()
+        .set(element, { opacity: 1 })
+        .fromTo(
+          '[data-mode="bg"]',
+          { opacity: 0, scale: 1.12 },
+          { opacity: 1, scale: 1, duration: 0.7, ease: 'power2.out' },
+          0,
+        )
+        .fromTo(
+          '[data-mode-item]',
+          { opacity: 0, y: 14 },
+          { opacity: 1, y: 0, duration: 0.45, stagger: 0.06, ease: 'power3.out' },
+          0.08,
+        )
+    },
+    { scope: cardRef, dependencies: [rendered.mode, rendered.payload?.index] },
+  )
 
   return (
     <article
@@ -96,111 +155,14 @@ export function SidebarCard({
       className="relative w-full rounded-shell border border-border bg-surface/40 p-2 lg:max-h-[calc(100svh-4rem)]"
     >
       <div className="relative isolate min-h-[calc(100svh-13rem)] overflow-hidden rounded-inner border border-border/60 bg-surface md:aspect-[4/3] md:min-h-0 lg:aspect-[3/4]">
-        {portraitUrl ? (
-          <Image
-            src={portraitUrl}
-            alt={portrait?.alt ?? ''}
-            fill
-            priority
-            sizes="(min-width: 1024px) 33vw, 100vw"
-            style={{ objectPosition }}
-            className="object-cover contrast-110 grayscale"
-          />
-        ) : (
-          <div aria-hidden="true" className="absolute inset-0 bg-surface-raised" />
-        )}
-
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-t from-base via-base/75 to-transparent"
-        />
-
-        {/* The mobile top bar carries the monogram below md; two of them would
-            sit within 60px of each other. */}
-        <div className="absolute top-5 left-5 max-md:hidden">
-          <Monogram value={monogram} />
-        </div>
-
-        {orderedSocials.length > 0 && (
-          <ul className="absolute top-5 right-5 flex flex-col gap-2.5">
-            {orderedSocials.map((social) => (
-              <li key={social.platform}>
-                <a
-                  href={social.url}
-                  target={social.platform === 'email' ? undefined : '_blank'}
-                  rel={social.platform === 'email' ? undefined : 'noreferrer noopener'}
-                  aria-label={socialLabel(social.platform)}
-                  className="grid size-10 place-items-center rounded-full border border-border bg-surface-raised text-fg-muted transition-colors duration-200 hover:border-accent hover:text-accent"
-                >
-                  <SocialIcon platform={social.platform} />
-                </a>
-              </li>
-            ))}
-          </ul>
-        )}
-
-        {/* A full 48px capsule pushed 20px past the left edge: the parent's
-            overflow-hidden clips its left half into long curves, and the 20px
-            left padding re-centres the label in what still shows. */}
-        {showBadge && (
-          <div className="absolute top-[44%] -left-5 flex w-12 -translate-y-1/2 flex-col items-center gap-3 rounded-full border border-border bg-surface-raised/90 py-4 pl-5">
-            <span className="rotate-180 font-sans text-[11px] leading-none font-medium text-fg [writing-mode:vertical-rl]">
-              {statusBadge.label}
-            </span>
-            <span
-              aria-hidden="true"
-              className="size-2 shrink-0 animate-status-pulse rounded-full bg-accent"
-            />
-          </div>
-        )}
-
-        <div className="absolute inset-x-0 bottom-0 p-5">
-          <h2 className="flex items-center font-display text-2xl font-semibold text-fg">
-            {cardGreeting}
-            <span
-              aria-hidden="true"
-              className="ml-1.5 inline-block h-6 w-0.5 animate-caret bg-fg"
-            />
-          </h2>
-
-          <p className="mt-2 text-sm leading-relaxed text-fg-muted">{cardBio}</p>
-
-          {/* Takes no space when empty — reserving height here pushed the
-              greeting off-centre at the hero. */}
-          <CardReadout />
-
-          <hr className="my-4 border-border/70" />
-
-          {(primaryCta ?? secondaryCta) && (
-            <div className="flex items-center gap-3">
-              {primaryCta && (
-                <>
-                  <a
-                    href={primaryCta.href}
-                    aria-label={primaryCta.label}
-                    tabIndex={-1}
-                    className="grid size-11 shrink-0 place-items-center rounded-full bg-accent text-base transition-opacity hover:opacity-90 max-sm:hidden"
-                  >
-                    <ArrowUpRightIcon />
-                  </a>
-                  <a
-                    href={primaryCta.href}
-                    className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium whitespace-nowrap text-base transition-opacity hover:opacity-90"
-                  >
-                    {primaryCta.label}
-                  </a>
-                </>
-              )}
-              {secondaryCta && (
-                <a
-                  href={secondaryCta.href}
-                  className="inline-flex items-center gap-2 text-sm font-semibold whitespace-nowrap text-fg transition-colors hover:text-accent"
-                >
-                  <DocumentIcon />
-                  {secondaryCta.label}
-                </a>
-              )}
-            </div>
+        {/* Both layers fade together: the wrapper holds the background and the
+            content, so the card is briefly empty at the swap point rather than
+            ghosting one project over the next. */}
+        <div ref={contentRef} className="absolute inset-0">
+          {rendered.mode === 'project' && rendered.payload ? (
+            <ProjectMode payload={rendered.payload} monogram={props.monogram} />
+          ) : (
+            <IdentityMode {...props} />
           )}
         </div>
       </div>

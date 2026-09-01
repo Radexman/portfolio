@@ -39,9 +39,16 @@ export interface FeaturedWorkData {
   projects: FeaturedProject[] | null
 }
 
-export interface FeaturedWorkPayload {
-  role: string
-  company: string
+// A `type`, not an `interface`: only inferred object types get an implicit index
+// signature, so an interface will not satisfy `SectionPayload`.
+export type ProjectCardPayload = {
+  index: number
+  total: number
+  slug: string
+  title: string
+  description: string
   year: string
+  role: string
   stack: string[]
+  cover: string | null
 }
