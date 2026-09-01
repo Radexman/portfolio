@@ -64,3 +64,36 @@ export const featuredWorkQuery = defineQuery(`{
     "stack": stack[]->name
   }
 }`)
+
+/**
+ * The Side project section: header copy, the three triptych photographs, the
+ * referenced hive app and the inspection steps, in one round trip.
+ *
+ * `project` is dereferenced inline rather than fetched separately so the block
+ * renders the same `project` document the More work bento will have to exclude
+ * by `_id`. `approach` is projected here but not in `featuredWorkQuery` — this
+ * block states the constraint and then the response, so it needs both.
+ */
+export const sideProjectQuery = defineQuery(`
+  *[_type == "sideProjectSection"][0]{
+    eyebrow,
+    headline,
+    framingLine,
+    triptych[]{ alt, caption, asset, hotspot, crop },
+    inspectionSteps[]{ prompt, response, field },
+    project->{
+      _id,
+      title,
+      "slug": slug.current,
+      thesis,
+      company,
+      role,
+      year,
+      visibility,
+      liveUrl,
+      problem,
+      approach,
+      "stack": stack[]->name
+    }
+  }
+`)

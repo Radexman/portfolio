@@ -7,7 +7,7 @@ Build the `SideProjectSection` component — the seventh section of the portfoli
 1. A **triptych** of three photographs — building, teaching, beekeeping — presented with identical treatment so they read as one statement rather than a collage
 2. A **project block** for the hive management app: a Python service that generates inspection reports, extended with a **voice-driven, hands-free inspection flow** for experienced beekeepers
 
-This is the only section on the page describing work that was self-initiated, self-designed, and used by its own author. That is the argument it makes, and the framing line states it directly: *the only project on this page where I was also the user.*
+This is the only section on the page describing work that was self-initiated, self-designed, and used by its own author. That is the argument it makes, and the framing line states it directly: _the only project on this page where I was also the user._
 
 It sits between More work and Contact, and is deliberately styled to contrast with the client work above it.
 
@@ -33,13 +33,13 @@ That is the story this section tells. Not "I built an app for my hobby" — a do
 
 ### `sideProjectSection` — add to the `homePage` singleton
 
-| Field | Type | Notes |
-| --- | --- | --- |
-| `eyebrow` | string | Default: `"Side project"` |
-| `headline` | string | Default: `"Built for the one user I could interview any time"` |
-| `framingLine` | text | Default: `"The only project on this page where I was also the user."` |
-| `triptych` | array of `triptychImage` | Exactly 3, validated |
-| `project` | reference → `project` | The hive app document |
+| Field         | Type                     | Notes                                                                 |
+| ------------- | ------------------------ | --------------------------------------------------------------------- |
+| `eyebrow`     | string                   | Default: `"Side project"`                                             |
+| `headline`    | string                   | Default: `"Built for the one user I could interview any time"`        |
+| `framingLine` | text                     | Default: `"The only project on this page where I was also the user."` |
+| `triptych`    | array of `triptychImage` | Exactly 3, validated                                                  |
+| `project`     | reference → `project`    | The hive app document                                                 |
 
 ### `triptychImage` object
 
@@ -52,18 +52,18 @@ Order is fixed by array order. The sequence is intentional: two things the rest 
 
 A normal `project` document with `featured: false`. Fields consumed here:
 
-| Field | Seed value |
-| --- | --- |
-| `title` | Hive Log |
-| `thesis` | `product-thinking` |
-| `company` | Personal project |
-| `role` | Everything — design, backend, voice flow |
-| `year` | 2025 — present |
-| `visibility` | `public` or `no-public-url`, whichever is true |
-| `stack` | Python, FastAPI, Whisper (or whichever STT), an LLM for extraction, PDF generation, the frontend framework |
-| `problem` | Inspecting a hive occupies both hands. Records get written from memory hours later, or not at all. |
-| `approach` | A spoken, guided inspection: the app reads each step aloud, the beekeeper answers, and speech is parsed into a structured record. Reports generate from the captured data. |
-| `outcome` | Inspections recorded at the hive instead of reconstructed afterwards, with per-colony history and seasonal comparison. |
+| Field        | Seed value                                                                                                                                                                 |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `title`      | Hive Log                                                                                                                                                                   |
+| `thesis`     | `product-thinking`                                                                                                                                                         |
+| `company`    | Personal project                                                                                                                                                           |
+| `role`       | Everything — design, backend, voice flow                                                                                                                                   |
+| `year`       | 2025 — present                                                                                                                                                             |
+| `visibility` | `public` or `no-public-url`, whichever is true                                                                                                                             |
+| `stack`      | Python, FastAPI, Whisper (or whichever STT), an LLM for extraction, PDF generation, the frontend framework                                                                 |
+| `problem`    | Inspecting a hive occupies both hands. Records get written from memory hours later, or not at all.                                                                         |
+| `approach`   | A spoken, guided inspection: the app reads each step aloud, the beekeeper answers, and speech is parsed into a structured record. Reports generate from the captured data. |
+| `outcome`    | Inspections recorded at the hive instead of reconstructed afterwards, with per-colony history and seasonal comparison.                                                     |
 
 **Exclude this document from the More work bento** so it does not render twice. The bento query filters it out by dereferencing `homePage.sideProjectSection.project._ref`:
 
@@ -174,7 +174,7 @@ Add `SideProjectReadout` to the variant map in `CardReadout.tsx`. Same layout as
 ## GSAP Animations
 
 ```ts
-gsap.registerPlugin(useGSAP, ScrollTrigger);
+gsap.registerPlugin(useGSAP, ScrollTrigger)
 ```
 
 All inside `useGSAP(() => { … }, { scope: sectionRef })`.
@@ -187,10 +187,10 @@ All inside `useGSAP(() => { … }, { scope: sectionRef })`.
 
 `start: "top 75%"`, `once: true`.
 
-| Target | From | Duration | Stagger |
-| --- | --- | --- | --- |
-| Figures | `opacity: 0, y: 32` | `0.7` | `0.1` |
-| Captions | `opacity: 0, y: 8` | `0.4` | `0.1`, offset `+0.2` |
+| Target   | From                | Duration | Stagger              |
+| -------- | ------------------- | -------- | -------------------- |
+| Figures  | `opacity: 0, y: 32` | `0.7`    | `0.1`                |
+| Captions | `opacity: 0, y: 8`  | `0.4`    | `0.1`, offset `+0.2` |
 
 Left to right. The stagger is what makes three images read as a sequence rather than a grid appearing at once.
 
@@ -212,13 +212,13 @@ The stagger here is slower than elsewhere on purpose — it should feel like a c
 
 ## Responsive
 
-| Breakpoint | Behaviour |
-| --- | --- |
-| `lg` (1024px+) | Triptych `grid-cols-3`, project block `p-8`, content `max-w-4xl` |
-| `md` | Triptych stays `grid-cols-3` — three portrait images at tablet width still read fine |
-| `< md` | Triptych becomes a horizontal scroll row: `flex gap-3 overflow-x-auto snap-x snap-mandatory`, each figure `w-[70%] shrink-0 snap-center`, scrollbar hidden. **Do not stack the three vertically** — the statement depends on seeing them together, and stacked they become three unrelated photos. |
-| `< md` | Voice flow indentation reduces to `pl-4`; step text drops to `text-sm` |
-| `< md` | Project block `p-5`, title `text-xl` |
+| Breakpoint     | Behaviour                                                                                                                                                                                                                                                                                          |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `lg` (1024px+) | Triptych `grid-cols-3`, project block `p-8`, content `max-w-4xl`                                                                                                                                                                                                                                   |
+| `md`           | Triptych stays `grid-cols-3` — three portrait images at tablet width still read fine                                                                                                                                                                                                               |
+| `< md`         | Triptych becomes a horizontal scroll row: `flex gap-3 overflow-x-auto snap-x snap-mandatory`, each figure `w-[70%] shrink-0 snap-center`, scrollbar hidden. **Do not stack the three vertically** — the statement depends on seeing them together, and stacked they become three unrelated photos. |
+| `< md`         | Voice flow indentation reduces to `pl-4`; step text drops to `text-sm`                                                                                                                                                                                                                             |
+| `< md`         | Project block `p-5`, title `text-xl`                                                                                                                                                                                                                                                               |
 
 Add a subtle edge fade on the mobile scroll row (`mask-image` gradient) so it reads as scrollable without a visible scrollbar.
 

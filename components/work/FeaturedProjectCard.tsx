@@ -7,7 +7,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useMemo, useRef } from 'react'
 
+import { StackTags } from '@/components/work/StackTags'
 import { THESIS_LABELS, VISIBILITY_FALLBACKS } from '@/content/work'
+import { firstSentence, hostnameOf } from '@/lib/format'
 import { useSectionObserverContext } from '@/lib/section-observer'
 import { urlFor } from '@/sanity/lib/image'
 import type { FeaturedProject } from '@/types/work'
@@ -18,19 +20,6 @@ const SECTION_ID = 'work'
 const CARD_ROOT_MARGIN = '-45% 0px -45% 0px'
 const MAX_TAGS_DESKTOP = 4
 const MAX_TAGS_MOBILE = 3
-
-function firstSentence(text: string) {
-  const match = /^[\s\S]*?[.!?](?=\s|$)/.exec(text.trim())
-  return (match ? match[0] : text.trim()).trim()
-}
-
-function hostnameOf(url: string) {
-  try {
-    return new URL(url).hostname.replace(/^www\./, '')
-  } catch {
-    return url
-  }
-}
 
 interface FeaturedProjectCardProps {
   project: FeaturedProject
@@ -125,7 +114,6 @@ export function FeaturedProjectCard({ project, index }: FeaturedProjectCardProps
     : '50% 50%'
 
   const fallbackLabel = VISIBILITY_FALLBACKS[project.visibility]
-  const hiddenTagCount = stack.length - MAX_TAGS_DESKTOP
   const problemLine = firstSentence(project.problem)
 
   return (
@@ -186,31 +174,13 @@ export function FeaturedProjectCard({ project, index }: FeaturedProjectCardProps
 
         <p className="mt-5 max-w-md leading-relaxed text-base text-fg-muted">{problemLine}</p>
 
-        {stack.length > 0 && (
-          <ul className="mt-6 flex flex-wrap gap-2">
-            {stack.slice(0, MAX_TAGS_DESKTOP).map((name, tagIndex) => (
-              <li
-                key={name}
-                data-card="tag"
-                className={
-                  tagIndex >= MAX_TAGS_MOBILE
-                    ? 'hidden rounded-sm border border-border bg-surface px-2.5 py-1 font-mono text-[11px] tracking-wider text-fg-muted uppercase md:block'
-                    : 'rounded-sm border border-border bg-surface px-2.5 py-1 font-mono text-[11px] tracking-wider text-fg-muted uppercase'
-                }
-              >
-                {name}
-              </li>
-            ))}
-            {hiddenTagCount > 0 && (
-              <li
-                data-card="tag"
-                className="rounded-sm border border-border bg-surface px-2.5 py-1 font-mono text-[11px] tracking-wider text-fg-muted uppercase"
-              >
-                +{hiddenTagCount}
-              </li>
-            )}
-          </ul>
-        )}
+        <StackTags
+          names={stack}
+          max={MAX_TAGS_DESKTOP}
+          mobileMax={MAX_TAGS_MOBILE}
+          dataCard="tag"
+          className="mt-6"
+        />
 
         {project.designCredit && (
           <p className="mt-4 font-mono text-[11px] text-fg-muted">{project.designCredit}</p>
