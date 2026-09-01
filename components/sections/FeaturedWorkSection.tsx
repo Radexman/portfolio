@@ -19,7 +19,12 @@ export async function FeaturedWorkSection() {
   return (
     <FeaturedWorkShell copy={section ?? FALLBACK_COPY}>
       {projects.map((project, index) => (
-        <FeaturedProjectCard key={project._id} project={project} index={index} />
+        <FeaturedProjectCard
+          key={project._id}
+          project={project}
+          index={index}
+          total={projects.length}
+        />
       ))}
     </FeaturedWorkShell>
   )

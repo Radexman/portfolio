@@ -60,7 +60,17 @@ export function FeaturedWorkShell({
         )}
       </div>
 
-      <div className="mt-16">{children}</div>
+      {/* One shared containing block for every tile: a sticky element releases
+          when its own parent scrolls out, so tiles must be siblings here rather
+          than each sitting in its own wrapper, or the first would unpin before
+          the last arrived. */}
+      <div className="relative mt-16">
+        {children}
+        {/* A real element, not padding: sticky containment clamps to the content
+            box, so padding-bottom would not extend the stack's dwell — and this
+            also stops the last tile's margin collapsing out of the list. */}
+        <div aria-hidden="true" className="hidden lg:block lg:h-[60vh]" />
+      </div>
     </section>
   )
 }

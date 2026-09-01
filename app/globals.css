@@ -26,6 +26,12 @@
      rectangle behind the panel rather than a coloured drop shadow. */
   --shadow-offset-accent: 10px 10px 0 0 rgb(0 229 199 / 0.1);
 
+  /* Stacked work tiles. Weighted upward, because what has to separate is the
+     card's top edge from the one it is sliding over. */
+  --shadow-card-stack:
+    0 -1px 0 0 rgb(232 230 227 / 0.06), 0 -24px 60px -20px rgb(0 0 0 / 0.9),
+    0 -8px 24px -12px rgb(0 0 0 / 0.7), 0 24px 48px -32px rgb(0 0 0 / 0.8);
+
   /* Tracking */
   --tracking-display: -0.02em; /* Inter Tight headings */
   --tracking-label: 0.08em; /* uppercase mono labels */

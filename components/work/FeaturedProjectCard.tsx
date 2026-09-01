@@ -11,6 +11,7 @@ import { StackTags } from '@/components/work/StackTags'
 import { THESIS_LABELS, VISIBILITY_FALLBACKS } from '@/content/work'
 import { firstSentence, hostnameOf } from '@/lib/format'
 import { useSectionObserverContext } from '@/lib/section-observer'
+import { useMediaQuery } from '@/lib/use-media-query'
 import { urlFor } from '@/sanity/lib/image'
 import type { FeaturedProject } from '@/types/work'
 
@@ -20,37 +21,80 @@ const SECTION_ID = 'work'
 const CARD_ROOT_MARGIN = '-45% 0px -45% 0px'
 const MAX_TAGS_DESKTOP = 4
 const MAX_TAGS_MOBILE = 3
+const CARD_COVER_WIDTH = 480
+
+// Each tile pins one step lower than the one before it. The step is roughly a
+// fifth of the tile's height, so an arriving card covers about 80% of the one
+// beneath and the stack keeps showing its own edges.
+const STACK_TOP_REM = 6
+const STACK_STEP_REM = 6
+// Trailing space under each tile is what the stack scrolls through; without it
+// the cards would pile up in a single flick.
+const STACK_GAP = '45vh'
 
 interface FeaturedProjectCardProps {
   project: FeaturedProject
   index: number
+  total: number
 }
 
-export function FeaturedProjectCard({ project, index }: FeaturedProjectCardProps) {
+export function FeaturedProjectCard({ project, index, total }: FeaturedProjectCardProps) {
+  const sentinelRef = useRef<HTMLDivElement>(null)
   const cardRef = useRef<HTMLElement>(null)
-  const figureRef = useRef<HTMLElement>(null)
   const { setPayload } = useSectionObserverContext()
+
+  // The sidebar card only enters project mode at lg, where it is sticky. Below
+  // that there is nothing to update, so the observer never starts.
+  const isDesktop = useMediaQuery('(min-width: 64rem)')
 
   const stack = useMemo(
     () => (project.stack ?? []).filter((name): name is string => Boolean(name)),
     [project.stack],
   )
 
+  const problemLine = firstSentence(project.problem)
+
+  // A deliberately small transform, not the full cover: the sidebar shows an
+  // atmospheric wash, and Sanity's LQIP is a ~20px image that upscales to mush
+  // rather than to something recognisable.
+  const cardCover = project.coverImage?.asset
+    ? urlFor(project.coverImage).width(CARD_COVER_WIDTH).quality(55).auto('format').url()
+    : null
+
   const payload = useMemo(
     () => ({
-      role: project.role,
-      company: project.company,
+      index,
+      total,
+      slug: project.slug,
+      title: project.title,
+      description: problemLine,
       year: project.year,
+      role: project.role,
       stack,
+      cover: cardCover,
     }),
-    [project.role, project.company, project.year, stack],
+    [
+      index,
+      total,
+      project.slug,
+      project.title,
+      problemLine,
+      project.year,
+      project.role,
+      stack,
+      cardCover,
+    ],
   )
 
-  // Pushes on enter only. Between two cards nothing owns the middle band, and
-  // clearing there would flicker the readout on every scroll through a gap.
+  // Observes a sentinel, not the tile: the tile is sticky, and a sticky element
+  // reports its pinned rect to IntersectionObserver, which would leave every
+  // tile permanently "active" once stuck. The sentinel is an absolutely placed
+  // band covering this project's share of the stack, so it scrolls normally.
+  // Pushes on enter only — between two bands nothing owns the middle, and
+  // clearing there would blank the sidebar on every scroll through a gap.
   useEffect(() => {
-    const element = cardRef.current
-    if (!element) return
+    const element = sentinelRef.current
+    if (!element || !isDesktop) return
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -61,43 +105,20 @@ export function FeaturedProjectCard({ project, index }: FeaturedProjectCardProps
 
     observer.observe(element)
     return () => observer.disconnect()
-  }, [setPayload, payload])
+  }, [setPayload, payload, isDesktop])
 
   useGSAP(
     () => {
       const mm = gsap.matchMedia()
 
       mm.add('(prefers-reduced-motion: no-preference)', () => {
-        const timeline = gsap.timeline({
-          defaults: { ease: 'power3.out' },
-          scrollTrigger: {
-            trigger: cardRef.current,
-            start: 'top 75%',
-            once: true,
-          },
+        gsap.from('[data-tile-inner]', {
+          opacity: 0,
+          y: 40,
+          duration: 0.7,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: cardRef.current, start: 'top 90%', once: true },
         })
-
-        timeline
-          .from('[data-card="figure"]', { opacity: 0, y: 40, duration: 0.7 }, 0)
-          .from('[data-card="text"] > *', { opacity: 0, y: 24, duration: 0.5, stagger: 0.06 }, 0.15)
-          .from('[data-card="tag"]', { opacity: 0, y: 12, duration: 0.4, stagger: 0.04 }, 0.4)
-      })
-
-      mm.add('(prefers-reduced-motion: no-preference) and (min-width: 48rem)', () => {
-        gsap.fromTo(
-          '[data-card="image"]',
-          { yPercent: -6 },
-          {
-            yPercent: 6,
-            ease: 'none',
-            scrollTrigger: {
-              trigger: figureRef.current,
-              start: 'top bottom',
-              end: 'bottom top',
-              scrub: 0.6,
-            },
-          },
-        )
       })
 
       return () => mm.revert()
@@ -114,101 +135,111 @@ export function FeaturedProjectCard({ project, index }: FeaturedProjectCardProps
     : '50% 50%'
 
   const fallbackLabel = VISIBILITY_FALLBACKS[project.visibility]
-  const problemLine = firstSentence(project.problem)
 
   return (
-    <article
-      ref={cardRef}
-      className={`relative grid items-center gap-8 border-t border-border py-12 lg:min-h-[70vh] lg:grid-cols-2 lg:gap-12 lg:py-16 ${
-        index % 2 === 1 ? 'lg:[&>figure]:order-2' : ''
-      }`}
-    >
-      <figure
-        ref={figureRef}
-        data-card="figure"
-        className="relative aspect-[4/3] overflow-hidden rounded-card border border-border bg-surface transition-colors after:absolute after:inset-x-0 after:top-0 after:h-px after:bg-gradient-to-r after:from-transparent after:via-border after:to-transparent after:content-[''] hover:border-accent/40 md:aspect-[16/10]"
+    <>
+      <div
+        ref={sentinelRef}
+        aria-hidden="true"
+        style={{ top: `${(index / total) * 100}%`, height: `${100 / total}%` }}
+        className="pointer-events-none absolute inset-x-0 hidden lg:block"
+      />
+
+      <article
+        ref={cardRef}
+        style={{ top: `${STACK_TOP_REM + index * STACK_STEP_REM}rem`, marginBottom: STACK_GAP }}
+        className="relative max-lg:!mb-16 lg:sticky"
       >
-        {coverUrl ? (
-          <Image
-            data-card="image"
-            src={coverUrl}
-            alt=""
-            fill
-            sizes="(min-width: 1024px) 50vw, 100vw"
-            style={{ objectPosition }}
-            // Scaled up at rest so the parallax scrub never exposes an edge.
-            className="scale-[1.08] object-cover"
+        {/* The same two-layer shell as the sidebar card — outer frame, hairline
+            inner frame — so the tiles read as cards rather than bare images. */}
+        <Link
+          data-tile-inner
+          href={`/work/${project.slug}`}
+          className="group block rounded-shell border border-border bg-surface p-2 shadow-card-stack transition-colors hover:border-accent"
+        >
+          <figure className="relative aspect-[16/10] overflow-hidden rounded-inner border border-border bg-surface">
+            {coverUrl ? (
+              <Image
+                src={coverUrl}
+                alt=""
+                fill
+                sizes="(min-width: 1024px) 62vw, 100vw"
+                style={{ objectPosition }}
+                className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+              />
+            ) : (
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 grid place-items-center bg-surface-raised"
+              >
+                <span className="font-mono text-[11px] tracking-label text-fg-muted uppercase">
+                  {'// screenshot pending'}
+                </span>
+              </div>
+            )}
+            <figcaption className="sr-only">
+              {project.coverImage?.alt ?? `${project.title} — no screenshot yet`}
+            </figcaption>
+          </figure>
+
+          <span className="sr-only">
+            {project.title} — {THESIS_LABELS[project.thesis] ?? project.thesis}. {problemLine} Open
+            the case study.
+          </span>
+        </Link>
+
+        {/* Below lg the sidebar card never enters project mode, so the tile has
+            to carry its own copy or the section is a wall of unlabelled images. */}
+        <div className="mt-5 lg:hidden">
+          <p className="font-mono text-xs tracking-[0.18em] text-accent uppercase">
+            {THESIS_LABELS[project.thesis] ?? project.thesis}
+          </p>
+
+          <h3 className="mt-2 font-display text-2xl font-bold tracking-display text-fg md:text-3xl">
+            {project.title}
+          </h3>
+
+          <p className="mt-2 font-mono text-[11px] tracking-widest text-fg-muted uppercase">
+            {project.role} · {project.company} · {project.year}
+          </p>
+
+          <p className="mt-4 max-w-md leading-relaxed text-fg-muted">{problemLine}</p>
+
+          <StackTags
+            names={stack}
+            max={MAX_TAGS_DESKTOP}
+            mobileMax={MAX_TAGS_MOBILE}
+            className="mt-5"
           />
-        ) : (
-          <div
-            data-card="image"
-            aria-hidden="true"
-            className="absolute inset-0 grid scale-[1.08] place-items-center bg-surface-raised"
-          >
-            <span className="font-mono text-[11px] tracking-label text-fg-muted uppercase">
-              {'// screenshot pending'}
-            </span>
-          </div>
-        )}
-        <figcaption className="sr-only">
-          {project.coverImage?.alt ?? `${project.title} — no screenshot yet`}
-        </figcaption>
-      </figure>
 
-      <div data-card="text" className="max-w-lg">
-        <p className="font-mono text-[11px] tracking-widest text-fg-muted">
-          {String(index + 1).padStart(2, '0')}
-        </p>
-
-        <p className="mt-4 font-mono text-xs tracking-[0.18em] text-accent uppercase">
-          {THESIS_LABELS[project.thesis] ?? project.thesis}
-        </p>
-
-        <h3 className="mt-3 font-display text-2xl font-bold tracking-display text-fg md:text-3xl lg:text-4xl">
-          {project.title}
-        </h3>
-
-        <p className="mt-3 font-mono text-[11px] tracking-widest text-fg-muted uppercase">
-          {project.role} · {project.company} · {project.year}
-        </p>
-
-        <p className="mt-5 max-w-md leading-relaxed text-base text-fg-muted">{problemLine}</p>
-
-        <StackTags
-          names={stack}
-          max={MAX_TAGS_DESKTOP}
-          mobileMax={MAX_TAGS_MOBILE}
-          dataCard="tag"
-          className="mt-6"
-        />
-
-        {project.designCredit && (
-          <p className="mt-4 font-mono text-[11px] text-fg-muted">{project.designCredit}</p>
-        )}
-
-        <div className="mt-8 flex flex-wrap items-center gap-5">
-          <Link
-            href={`/work/${project.slug}`}
-            className="font-mono text-xs tracking-widest text-fg uppercase underline decoration-accent underline-offset-4 transition-colors hover:text-accent"
-          >
-            <span aria-hidden="true">→</span> case study
-            <span className="sr-only"> for {project.title}</span>
-          </Link>
-
-          {project.visibility === 'public' && project.liveUrl ? (
-            <a
-              href={project.liveUrl}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="font-mono text-xs tracking-widest text-fg-muted transition-colors hover:text-accent"
-            >
-              <span aria-hidden="true">↗</span> {hostnameOf(project.liveUrl)}
-            </a>
-          ) : (
-            fallbackLabel && <p className="font-mono text-xs text-fg-muted">{fallbackLabel}</p>
+          {project.designCredit && (
+            <p className="mt-4 font-mono text-[11px] text-fg-muted">{project.designCredit}</p>
           )}
+
+          <div className="mt-6 flex flex-wrap items-center gap-5">
+            <Link
+              href={`/work/${project.slug}`}
+              className="font-mono text-xs tracking-widest text-fg uppercase underline decoration-accent underline-offset-4 transition-colors hover:text-accent"
+            >
+              <span aria-hidden="true">→</span> case study
+              <span className="sr-only"> for {project.title}</span>
+            </Link>
+
+            {project.visibility === 'public' && project.liveUrl ? (
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="font-mono text-xs tracking-widest text-fg-muted transition-colors hover:text-accent"
+              >
+                <span aria-hidden="true">↗</span> {hostnameOf(project.liveUrl)}
+              </a>
+            ) : (
+              fallbackLabel && <p className="font-mono text-xs text-fg-muted">{fallbackLabel}</p>
+            )}
+          </div>
         </div>
-      </div>
-    </article>
+      </article>
+    </>
   )
 }
