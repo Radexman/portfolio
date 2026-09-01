@@ -1,108 +1,16 @@
 # Current Feature
 
-## Card Project Mode
-
-**Spec:** @context/features/card-project-mode-spec.md
-
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- **The sticky card has two modes.** `identity` (portrait, monogram, socials, status badge, greeting, bio, both CTAs) and `project` (blurred cover background, monogram, title, description, Year, Role, stack pills, `Let's talk` only, position counter). Mode derives from context: `activeSection === 'work' && activePayload ? 'project' : 'identity'`.
-- **The container never moves.** Same border, radius, padding, dimensions in both modes. Title `line-clamp-1`, description `line-clamp-2`, three stack tags plus `+N`. Body anchored top, divider and CTA row pinned `absolute inset-x-0 bottom-0`. Verified against the longest and shortest project in the set.
-- **Sequential fade, not a crossfade.** Out `0.2s power2.in` → commit the DOM swap at the empty point → in `0.2s power2.out`. `0.25s` each way for a mode change. `contentRef` wraps both the background layer and the content layer so they fade together.
-- **`renderedPayload` is held in state**, separate from `activePayload`, or the outgoing content vanishes instead of fading.
-- **Rapid scrolling lands correctly.** `tlRef.current?.kill()` before starting a new timeline. Flinging the wheel through the section must land on the correct project with no queued replay.
-- **No full-resolution cover reaches the card.** Sanity LQIP (`asset->metadata.lqip`) as a `background-image` under `filter: blur(24px) saturate(1.2)`. LQIP strings arrive with the initial GROQ query, so all three are in memory on mount.
-- **Contrast is fixed, not adaptive.** A three-stop dark scrim (`0.92 → 0.72 → 0.55` of `rgb(10 11 14)`) plus `backdrop-filter: saturate(0.6)`, sitting between the blurred image and the content. 4.5:1 for the title, 3:1 for muted metadata, against every cover including the lightest. No luminance extraction.
-- **Payload widens** to `ProjectCardPayload` — `index`, `total`, `title`, `description`, `year`, `role`, `stack[]`, `lqip`. `total` comes from the featured array length, never a hardcoded `3`. Counter zero-padded: `01 / 03`.
-- **Between-card gaps hold the last payload.** Only leaving `work` entirely reverts to identity. Entering from below (scrolling up out of the next section) enters project mode on the **last** project.
-- **Below `lg` the feature does not exist.** The per-card observers do not register at all — no `IntersectionObserver` runs for a card nobody can see.
-- **Reduced motion still swaps.** Content cuts at full opacity in both directions; the mode change is information, not decoration.
-- **No third observer.** The existing `SectionObserverProvider` plus the per-card observers already in `FeaturedProjectCard` are the whole mechanism.
+<!-- Populated by /feature load -->
 
 ## Notes
 
-### What this supersedes
-
-The spec replaces the **Contextual Card Readout** from @context/features/featured-work-spec.md. In this codebase that means:
-
-- `components/layout/readouts/FeaturedWorkReadout.tsx` and its `min-h-18` reflow lock become dead code, and the `work` key comes out of the `READOUT_VARIANTS` map in `components/layout/CardReadout.tsx`
-- `CardReadout` itself **stays** — it is still the variant mechanism for Teaching, Skills and the Side project, and `beekeeping` is a live entry today
-- `FeaturedWorkPayload` in `types/work.ts` is superseded by `ProjectCardPayload`
-- @context/ai-interaction.md says never delete files without clarification — **confirm before removing `FeaturedWorkReadout.tsx`**
-
-### Spec paths do not match this repo
-
-The References block uses `@src/components/...`, `@src/lib/...`. There is no `src/` directory (@context/coding-standards.md). Real targets:
-
-| Spec path                                                 | Actual                                          |
-| --------------------------------------------------------- | ----------------------------------------------- |
-| `@src/components/layout/SidebarCard.tsx`                  | `components/layout/SidebarCard.tsx`             |
-| `@src/components/layout/card-modes/IdentityMode.tsx`      | `components/layout/card-modes/IdentityMode.tsx` |
-| `@src/components/layout/card-modes/ProjectMode.tsx`       | `components/layout/card-modes/ProjectMode.tsx`  |
-| `@src/lib/section-observer.tsx`                           | `lib/section-observer.tsx`                      |
-| `@context/portfolio-project-spec.md`                      | @context/project-overview.md                    |
-| `@context/hero-spec.md`, `@context/featured-work-spec.md` | both live under `context/features/`             |
-
-### Blockers to resolve before or during the build
-
-- **The two visual references do not exist.** `context/screenshots/` holds `card.png`, `card-icon-hover.png`, `card-pill.png`, `hamburger-modal.png`, `hero.png`, `mobile-hero.png`, `mobile-pill.png`, `navigation-pill.png` — no `featured-projects.png`, no `featured-projects-card-interaction.mp4`. Every timing and layout value in the spec is stated numerically, so the build can proceed, but there is nothing to check the result against.
-- **No project has a cover image.** Carried forward from the Featured Work feature: all three featured projects have an empty `coverImage`, so `asset->metadata.lqip` returns `null` for all of them and project mode ships with no background wash. Needs a defined fallback (the scrim over `bg-surface-raised`, most likely) and re-verification once covers land. **Acceptance criterion 2 — contrast against every cover — cannot be checked until then.**
-- **`lqip` is not in the query.** `featuredWorkQuery` in `sanity/lib/queries.ts` projects `coverImage` flat. It needs `coverImage{..., asset->{metadata{lqip}}}`, and `ProjectCoverImage` in `types/work.ts` widens to match.
-
-### Traps this codebase has already recorded
-
-- **`text-base` is a colour, not a size.** The spec writes `text-base text-fg` for the Year and Role values. `--color-base` is `#0A0B0E`, so Tailwind emits `.text-base{color:#0A0B0E}` — near-invisible. Use `text-[length:1rem]` or `text-sm`. Two existing files already carry this bug (`FeaturedWorkShell.tsx:57`, `FeaturedProjectCard.tsx`); do not add a third.
-- **`ProjectCardPayload` must be a `type`, not an `interface`.** Only inferred object types get an implicit index signature, so an interface will not satisfy `SectionPayload`'s `Record<string, unknown>`.
-- **`useGSAP` does not revert on dependency change** (`revertOnUpdate` defaults to `false`). That is what lets the swap animate from wherever the last one stopped — and it is why `gsap.matchMedia()` inside a state-keyed `useGSAP` is the wrong tool. `prefersReducedMotion()` from `lib/use-smooth-scroll.ts` is the pattern used elsewhere for exactly this; the spec asks for `matchMedia()`, and that conflict has to be resolved deliberately rather than by accident.
-- **`isDesktop` belongs in the `useGSAP` deps.** The container does not exist until the media query flips true after hydration, and the first swap would find no ref. `CardReadout` already does this.
-- **GSAP's rAF ticker stalls under Playwright until the mouse moves.** Move the mouse, then measure — mid-flight assertions otherwise read as failures.
-- **The dev server's generated CSS goes stale.** Verify new utilities against `.next/static/chunks/*.css` from a production build, and remember a Tailwind v4 `@theme` typo produces no class and no error.
-
-### Open questions
-
-- **Does `activeSection` ever leave `work` cleanly?** `resolveActive` returns early when nothing is visible, so the last active id persists. Reverting to identity mode depends on the _next_ section registering — with sections C–F unbuilt, `#beekeeping` is the only thing below `work`. Acceptance criterion 4 (entering from below on the last project) is testable; reverting to identity above the section may not be, since `#hero` sits above.
-- **The `< lg` observer guard changes existing behaviour.** `FeaturedProjectCard` currently registers unconditionally. Guarding it means the mobile card gets no payload at all — correct per the spec, and it confirms `beekeeping` is the only readout that can fire below `lg`, where `CardReadout` returns `null` anyway.
-- **The scrim's `backdrop-filter: saturate(0.6)` needs a compositing context that actually honours it.** The card interior is already `isolate overflow-hidden`; check it composes rather than silently no-op'ing.
-
-### Changes taken during the build, beyond the loaded spec
-
-All requested mid-build and confirmed by measurement or in the browser.
-
-- **The right column is now an image-only stack that folds on scroll.** The spec said "Right Column — no change"; that is superseded. Each project is a flow `<article>` (`lg:h-[86vh]`) wrapping a `lg:sticky` tile pinned at `6rem + index * 0.9rem`, so tiles pile up and show their own edges. The whole tile is a `Link` to the case study with an `sr-only` description, since the visible copy moved to the sidebar card.
-- **Below `lg` the tile keeps its own copy** (`lg:hidden` block: thesis, title, meta, problem line, stack tags, case-study and live links). The sidebar card never enters project mode under `lg`, so without this the section would be three unlabelled images on mobile.
-- **The observer watches the flow `<article>`, not the pinned tile.** A sticky element reports its pinned rect to `IntersectionObserver`, which would leave every tile permanently "active" once stuck.
-- **The scrim was tuned three times and ended lighter than the spec's.** Final: `from-base/88 via-base/50 via-55% to-base/38`, over a cover filtered `blur-[14px] contrast-[0.55] brightness-75 saturate-[1.4]`.
-  - The spec's own `0.92 / 0.72 / 0.55` measured **1.72:1** for muted metadata against a white cover, against its own 3:1 target — and 4.48:1 for the title against its 4.5:1 target.
-  - Raising the scrim fixed contrast but buried the image, which was rejected on sight.
-  - The fix is to normalise the cover instead of burying it: `contrast(0.55)` compresses every cover toward mid-grey before the scrim sees it, lifting a dark app screenshot into a visible wash and pulling a white one down until the text above stays legible.
-  - Metadata over the image is `text-fg/70`, not `text-fg-muted` — legibility bought with brighter type rather than a heavier wash.
-- **The swap is two phases, not one timeline.** Phase 1 fades the wrapper out and commits at the empty point (the spec's blank frame). Phase 2 is keyed on what is _rendered_ and runs the entrance: the background settles from `scale 1.12 → 1` over `0.7s` while `[data-mode-item]` children stagger in at `0.06`. It has to be a separate `useGSAP`: the incoming elements do not exist until React commits, so a selector added to the outgoing timeline resolves against the old DOM.
-- **`resolveActive` now writes `activeSectionRef` synchronously.** It previously lagged a render behind in an effect. On a long jump the section observer and a card observer fire in one batch, and the stale ref made `setPayload` skip — the card landed on the _previously_ viewed project. Reproduced (jumping from the top of the page onto project 1 showed project 2) and fixed.
-
-### Verified in Chrome at 1440×900 unless noted
-
-- Card interior `393×524` across hero, all three projects, and after the section — one distinct rect, zero movement
-- Cold jump onto project 1 lands on project 1; sequential scroll gives 01 → 02 → 03; scrolling up from Side project re-enters on **BRAIN**, the last project
-- Fling across all three inside 100 ms lands on the correct project with no queued replay
-- Swap timeline: all `[data-mode-item]` at opacity 0 in the same frame (the empty point), then `0.23 → 0.71/0.44 → 0.92/0.81/0.59/0.25` as the stagger runs, background scale `1.111 → 1.072 → 1.044 → 1.024 → 1.011 → 1`
-- Contrast sampled from rendered pixels against a pure-white cover fixture: title 5.11:1, description 3.58:1, YEAR/ROLE labels 3.86 / 4.17:1, values 6.18 / 7.01:1, counter 6.39:1 — all above the 4.5 / 3.0 targets
-- Pathological content (75-char title, 200-char description) clamps to 1 and 2 lines with the card rect unchanged
-- Reduced motion: opacity never leaves 1, content still swaps and still reverts to identity
-- `IntersectionObserver` construction counted via an init script: **3** card observers at 1440, **0** at 1023 and 390
-- 390 / 768: tiles static, per-tile copy visible, no horizontal overflow, card stays in identity mode
-- Production build, `tsc --noEmit` and `eslint` all clean; every new utility confirmed in `.next/static/chunks/*.css`, including `text-[length:1rem]{font-size:1rem}` — not the `text-base` colour trap
-
-### Open items
-
-- **`FeaturedWorkReadout.tsx` was deleted** (confirmed) along with `FeaturedWorkPayload`. `CardReadout` keeps `beekeeping` and is unchanged as the variant mechanism for later sections.
-- **The two visual references named in the spec still do not exist** in `context/screenshots/`. The build followed the reference image supplied in conversation instead.
-- **Cover images are now in the CMS** — the "no cover images" note carried from Featured Work is out of date. Two of the three show what look like real client records: the tile for Debt Exchange renders a job-listings page with real postings and locations, and a CV upload form. @context/project-overview.md's content rules require the ITP job posting to be replaced with a fictional one and forbid publishing real submissions. **Worth checking those two covers before deploy** — this is a content task, not a code one.
-- The case-study links still 404 until `/work/[slug]` ships in Phase 4.
-- Vitest still not installed; no new `lib/` functions landed in this feature.
+<!-- Populated by /feature load -->
 
 ## History
 
@@ -342,3 +250,55 @@ Section G — the hive app, the only project on the page where the author was al
 - **The bento exclusion rule is unbuildable yet.** More work does not exist, so its query cannot filter Hivewise out. A hard requirement for whoever builds section F
 - **`text-base` is dead weight in two existing files.** Confirmed against the production CSS: `.text-base{color:var(--color-base)}` — a colour, not a size. `FeaturedWorkShell.tsx:57` and `FeaturedProjectCard.tsx` both write `text-base text-fg-muted`; `.text-fg-muted` is emitted later so it currently wins and the render is correct by accident of source order
 - **`→ case study` links 404** until `/work/[slug]` ships in Phase 4
+
+### Card Project Mode + Stacking Work Tiles
+
+**Spec:** @context/features/card-project-mode-spec.md · **Merged:** 2026-09-01 · **Commit:** `524fb78`
+
+The interaction the split layout exists for. While Selected work is in view the sticky card stops being a portrait and becomes the active project's card; the right column stops being image-and-text rows and becomes tiles that fold into a stack.
+
+- **Card modes** — `components/layout/card-modes/`: `IdentityMode` (the previous card content, extracted verbatim), `ProjectMode` (new), and a shared `Monogram`. `SidebarCard` keeps the shell and owns the swap. Mode derives from context, never from the card's own logic.
+- **Project mode** — blurred cover as background, monogram, title (`line-clamp-1`), description (`line-clamp-2`), Year, Role, three stack pills plus `+N`, a `01 / 03` counter zero-padded off the featured array length, and a link to that project's case study. Socials and status badge drop out.
+- **Right column** — `FeaturedProjectCard` is now an image-only tile in a `rounded-shell` frame with a hairline inner frame, matching the sidebar card. All tiles are siblings of one container, pinned `6rem + index * 6rem`, so each covers ~80% of the one beneath and the stack holds until the section releases. Below `lg` each tile keeps its own copy.
+- **Payload** — `ProjectCardPayload` (`index`, `total`, `slug`, `title`, `description`, `year`, `role`, `stack[]`, `cover`) replaces `FeaturedWorkPayload`.
+- **Supersedes** the Featured work readout: `FeaturedWorkReadout.tsx` deleted (confirmed first, per @context/ai-interaction.md), `work` removed from `READOUT_VARIANTS`. `CardReadout` is unchanged as the variant mechanism and keeps `beekeeping`.
+
+**Decisions taken during the build:**
+
+- **The swap is two `useGSAP` passes, not one timeline.** Phase 1 fades the wrapper out and commits the DOM swap at the empty point — the reference's blank frame, not a crossfade. Phase 2 is keyed on what is _rendered_ and runs the entrance: background settling `scale 1.12 → 1` over `0.7s` while `[data-mode-item]` children stagger at `0.06`. It **must** be separate: the incoming elements do not exist until React commits, so a selector added to the outgoing timeline resolves against the old DOM.
+- **`prefersReducedMotion()`, not the spec's `gsap.matchMedia()`.** A matchMedia context reverts on teardown, which would snap the outgoing content back to full opacity for a frame every time a swap is interrupted. Matches the Mobile Nav precedent.
+- **The observer reads a sentinel, not the tile.** Once the tiles became sticky they report their pinned rect to `IntersectionObserver`, which would leave every tile permanently active. Each card renders an absolutely positioned band covering its share of the stack.
+- **All tiles share one containing block.** A sticky element releases when its own parent scrolls out, so with a wrapper each, tile 1 unpinned before tile 3 arrived. The dwell is a real spacer element, not `padding-bottom` — sticky containment clamps to the **content** box, so padding extended nothing.
+- **Project mode is gated on `lg` inside `SidebarCard`.** Relying on the observers not registering was not enough: a payload pushed at desktop width survives a resize down, and project mode followed the card onto mobile. Reproduced and fixed.
+- **A 480px CDN transform, not the LQIP.** The spec preferred `asset->metadata.lqip`, but that is a ~20px image upscaled 20× — it can never resolve into anything but mush, which is what made three rounds of blur tuning pointless. The `lqip` projection was removed from the query again.
+- **The right column redesign contradicts the spec**, which says "Right Column — no change". Requested mid-build and confirmed. The visible per-project copy moved to the sidebar card, so the whole tile is a `Link` with an `sr-only` description.
+
+**Verified in Chrome at 1440×900 unless noted:**
+
+- Card interior a constant `393×524` across hero, all three projects, and after the section — one distinct rect, zero movement, including with a 75-char title and 200-char description clamped to 1 and 2 lines
+- Cold jump onto project 1 lands on project 1; sequential gives 01 → 02 → 03; scrolling up from Side project re-enters on **BRAIN**, the last project; CTA tracks `/work/mb-group-multisite` → `/work/debt-exchange` → `/work/brain`
+- Fling across all three inside 100 ms lands correctly with no queued replay
+- Swap timeline sampled at 45 ms: every `[data-mode-item]` at opacity 0 in the same frame, then `0.23 → 0.71/0.44 → 0.92/0.81/0.59/0.25`, background scale `1.111 → 1.072 → 1.044 → 1.024 → 1.011 → 1`
+- Stack pins at exactly **96 / 192 / 288** px and holds there across ~1000 px of scroll before releasing
+- Card content on one 24px rhythm, measured gap-by-gap; CTA row 1px inside the card on all three projects
+- Reduced motion: opacity never leaves 1, content still swaps and still reverts to identity
+- `IntersectionObserver` construction counted via an init script: **3** card observers at 1440, **0** at 1023 and 390
+- Mobile: fresh load scrolled through `#work` and `#beekeeping` stays identity; resizing 1440 → 390 mid-project drops back to identity
+- Production build, `tsc --noEmit` and `eslint` clean; new utilities confirmed in `.next/static/chunks/*.css`, including `text-[length:1rem]{font-size:1rem}` — not the `text-base` colour trap
+
+**Gotchas recorded for later features:**
+
+- **`position: sticky` clamps to the containing block's _content_ box.** `padding-bottom` on the container does not extend how long an element stays pinned; only a real in-flow element does. The last child's `margin-bottom` also collapses out of the parent's height.
+- **A sticky element reports its pinned rect to `IntersectionObserver`**, not its flow position. Anything scroll-position-dependent must observe a separate non-sticky sentinel.
+- **A ref written in an effect lags a render behind**, which breaks any read of it from inside an observer callback firing in the same batch. `resolveActive` now writes `activeSectionRef` synchronously — the old version dropped a payload pushed alongside a section change and left the previous project on screen.
+- **Sanity's LQIP is only useful as a placeholder, never as artwork.** At ~20px it upscales to a featureless smear; use a small CDN transform when the image has to read.
+- **A media-query gate belongs in the consumer, not only in the producer.** Payloads outlive the observers that pushed them, so a breakpoint-specific mode has to check the breakpoint itself.
+- Tailwind v4 emits `text-base` as a **colour**; `text-[length:1rem]` is the size. Confirmed again in the production CSS.
+
+**Left for follow-up:**
+
+- **Two cover images may breach the content rules.** Covers are now in the CMS — the "no cover images" note from Featured Work is out of date — and two tiles render what look like real client records: a job-listings page with real postings and locations, and a CV upload form. @context/project-overview.md requires the ITP posting to be replaced with a fictional one and forbids publishing real submissions. **A content task to settle before deploy.**
+- **The spec's two visual references still do not exist** in `context/screenshots/` (`featured-projects.png`, `featured-projects-card-interaction.mp4`). A reference GIF was offered mid-build but exceeded the attachment size limit and never arrived, so the stack timing was built from description and measurement rather than matched to it.
+- **The scrim is lighter than the spec's** (`0.90 / 0.55 / 0.42` versus `0.92 / 0.72 / 0.55`) and the cover is blurred to `28px` so it reads as a colour gradient. Contrast was measured against a pure-white cover fixture at several intermediate settings; the shipped combination is comfortable, but any future lightening should be re-measured rather than eyeballed.
+- **`→ case study` links still 404** until `/work/[slug]` ships in Phase 4.
+- **Vitest still not installed.** No new `lib/` functions landed here, so the trigger from @context/coding-standards.md is unchanged from the Side project entry.
